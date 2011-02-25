@@ -40,7 +40,7 @@ DUBBE.form.create = function(param){
 
 }
 
-DUBBE.ajax("DUBBE.form") ;
+DUBBE.ajax("DUBBE.ajax") ;
 
 DUBBE.ajax.get = function(param) {
     

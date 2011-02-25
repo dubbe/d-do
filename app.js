@@ -56,40 +56,38 @@ var user = new User() ;
 
 // Routes
 
-// Dashboard
-app.get('/', function(req, res){
+// Serve the pages
+app.get('/:page.', function(req, res){
     
-    // The dashboard-view
-    
-    task.getAll(function(error, tasks){
-        res.render('tasks/render', {
+    if (!page) {
+        // The dashboard-view
+        res.render('index', {
             locals: {
-                title: "Tasks",
-                tasks: tasks
-                }
+                title: "D-Do"
+            }
         })
-    })
+    }
 });
 
 
-// List
-app.get('/:model.:format', function(req, res) {
+// API List
+app.get('/api/:model.:format', function(req, res) {
 });
 
 // Create 
-app.post('/:model.:format?', function(req, res) {
+app.post('/api/:model.:format?', function(req, res) {
 });
 
 // Read
-app.get('/:model/:id.:format?', function(req, res) {
+app.get('/api/:model/:id.:format?', function(req, res) {
 });
 
 // Update
-app.put('/:model/:id.:format?', function(req, res) {
+app.put('/api/:model/:id.:format?', function(req, res) {
 });
 
 // Delete
-app.del('/:model/:id.:format?', function(req, res) {
+app.del('/api/:model/:id.:format?', function(req, res) {
 });
 
 // Only listen on $ node app.js
