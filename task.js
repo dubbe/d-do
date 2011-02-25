@@ -8,8 +8,6 @@ Task.prototype.render = function(task, callback) {
 }
 Task.prototype.update = function(task, data, callback) {
 }
-Task.prototype.del = function(task, callback) {
-}
 Task.prototype.assign = function(task, data, callback) {
 }
 Task.prototype.updateTimeLeft = function(task, data, callbak) {
