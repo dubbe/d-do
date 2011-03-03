@@ -1,0 +1,118 @@
+body {
+     font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+}
+.popUp {
+     position: absolute ;
+     padding: 10px ;
+     text-align: center ;
+     border: 1px solid #aaa ;
+     
+     /*color is up to you, overlay png gives button a gradient*/
+     background: #eee url(alert-overlay.png) repeat-x;
+
+     /*style the cursor and text of the button*/
+     color: #333;
+     text-decoration: none;
+     line-height: 1;
+
+     /*add rounded corners in mozilla and webkit*/
+     -moz-border-radius: 5px;
+     -webkit-border-radius: 5px;
+
+     /*Add box shadows and a bottom border with rgba colors*/
+     -moz-box-shadow: 0 0 5px rgba(0,0,0,0.5);
+     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.5);
+     
+     
+}
+.popUp h2 {
+     text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+}
+.popUp p {
+    display: block ;
+    text-align: left ;
+     font-size: 12px ;
+     margin: 10px;
+     line-height: 1.5;
+}
+.popUpBg {
+    top:0px ;
+    left:0px ;
+    position: absolute ;
+    background: rgba(0,0,0,0.5) ;
+}
+.button {
+     /*color is up to you, overlay png gives button a gradient*/
+     background: #333 url(alert-overlay.png) repeat-x;
+
+     /*set up the layout just right*/
+     display: inline-block;
+     padding: 7px 15px 8px;
+     position: relative;
+     margin: 5px 5px ;
+
+     /*style the cursor and text of the button*/
+     color: #fff;
+     text-decoration: none;
+     line-height: 1;
+     cursor: pointer;
+
+     /*add rounded corners in mozilla and webkit*/
+     -moz-border-radius: 5px;
+     -webkit-border-radius: 5px;
+
+     /*Add box shadows and a bottom border with rgba colors*/
+     -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+     -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+     text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+     border-bottom: 1px solid rgba(0,0,0,0.25);
+}
+.button:hover {
+     top: 1px ;
+     -moz-box-shadow: 0 1px 1px rgba(0,0,0,0);
+     -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0);
+}
+.button a {
+     color: #fff ;
+     font-size: 10px ;
+     font-weight: bold ;
+     text-decoration: none ;
+}
+label {
+    color: #000 ;
+    font-size: 10px ;
+    font-weight: bold ;
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+    display:block ;
+    text-align: left ;
+}
+input {
+    /*color is up to you, overlay png gives button a gradient*/
+     background: #fff url(alert-overlay.png) repeat-x;
+
+     /*set up the layout just right*/
+     display: inline-block;
+     padding: 7px 15px 8px;
+     position: relative;
+     margin: 5px ;
+     
+     border: 1px solid #aaa ;
+
+
+     /*style the cursor and text of the button*/
+     color: #000;
+     text-decoration: none;
+     line-height: 1;
+
+     /*add rounded corners in mozilla and webkit*/
+     -moz-border-radius: 5px;
+     -webkit-border-radius: 5px;
+
+     /*Add box shadows and a bottom border with rgba colors*/
+     text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+}
+input:focus {
+    outline: none ;
+    -moz-box-shadow: 0 0 5px rgba(0, 255, 227, 0.5);
+     -webkit-box-shadow: 0 0 5px rgba(0, 255, 227, 0.5);
+}
