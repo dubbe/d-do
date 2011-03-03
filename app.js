@@ -5,7 +5,7 @@
 
 var express = require('express'),
     assert = require('assert'),
-    //cradle = require('cradle'),
+    //JSON = require('JSON'),
     Task = require('./task').Task,
     Category = require('./category').Category,
     User = require('./user').User ;
@@ -75,13 +75,16 @@ app.get('/api/:model.:format?', function(req, res) {
         if(req.params.model === "task") {
 
             task.render("testar", function(error, task){
-                res.render('tasks/render', {
-                  locals: {
-                    title: "d-Do",
-                    task: task
-                  }
-                });
-              })
+                var output = {title: "testar", body: "testar2"} ;
+                var body = JSON.stringify(output) ;   
+                
+                res.writeHead(200, {
+                    'Content-type': 'application/json',
+                    'Content-length': body.length,
+                    
+                })
+                res.end(body) ;
+            })
         } else {
             res.render('error', {
             locals: {
@@ -100,7 +103,8 @@ app.get('/api/:model.:format?', function(req, res) {
 });
 
 // Create 
-app.get('/api/save/:model', function(req, res) {
+app.post('/api/:model', function(req, res) {
+    
     task.create({
         title: req.param('title'),
         body: req.param('body'),
@@ -113,6 +117,15 @@ app.get('/api/save/:model', function(req, res) {
           }
         });
     });
+   
+   res.writeHead(200, {
+        'Content-type': 'text/plain'
+    })
+    
+    res.end('Success (should replace for json-object?') ;
+    
+    return ;
+   
 });
 /*
 
