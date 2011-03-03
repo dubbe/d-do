@@ -32,13 +32,21 @@ DUBBE.utils.popup = function(param){
 
 DUBBE.utils.createButton = function(param){
 
+    return $("<div>").attr("class", "button").append(
+        $("<a>").attr("href", "#").text(param.text).click(function(e) {
+            e.preventDefault() ;
+            param.fn();
+        })
+    ) ;
+
 }
 
 DUBBE.namespace("DUBBE.form") ;
 
 DUBBE.form.create = function(param){
     
-    var form, d = document  ;
+    var form ;
+    var inputs = {}  ;
     var name = (param.name) ? param.name : "form" ;
     var parent = (param.parent) ? $("#"+param.parent) : $("body") ;
     var submitText = (param.submitText) ? param.submitText : "submit" ;
@@ -47,6 +55,7 @@ DUBBE.form.create = function(param){
     
     if(param.fields) {
         for (i = 0; i < param.fields.length; i += 1) {
+            
             var type = (param.fields[i].type) ? param.fields[i].type : "input" ;
             var value = (param.fields[i].value) ? param.fields[i].value : "" ;
             var label = (param.fields[i].label) ? param.fields[i].label+": " : param.fields[i].name+": " ;
@@ -55,25 +64,34 @@ DUBBE.form.create = function(param){
                 for: param.fields[i].name
             }).appendTo(form).text(label) ;
             
-            $("<input>").attr({
-                type: type,
-                name: param.fields[i].name,
-                value: value 
-            }).appendTo(form) ;
+            if (type === "text") {
+                input = $("<textarea>").attr({
+                    name: param.fields[i].name,
+                    value: value
+                }).appendTo(form);
+            } else {
+                input = $("<input>").attr({
+                    type: type,
+                    name: param.fields[i].name,
+                    value: value
+                }).appendTo(form);
+            }
+            
+            inputs[param.fields[i].name] = input ;
             
         }
     }
     
     if (param.submit) {
-        var input = $("<input>").attr({
-                type: "submit",
-                value: submitText
-        }).appendTo(form) ;
         
-        $(input).click(function(e) {
-            e.preventDefault(e) ;
-            param.submit(e) ;
-        }) ;
+        DUBBE.utils.createButton({
+            text: submitText,
+            fn: function(){
+                param.submit(inputs) ;
+            }                
+            
+        }).appendTo(form) ;
+
     }
 
 }
