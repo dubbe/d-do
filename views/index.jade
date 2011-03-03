@@ -5,13 +5,17 @@
   |         name: "testar",
   |         parent: "testar",
   |         fields: [{
-  |             name: "input",
-  |             type: "text"
+  |             name: "name",
+  |             type: "input",
+  |             label: "Namn"
   |             
-  |         }
-  |         ],
+  |         }, {
+  |             name: "info",
+  |             type: "text",
+  |             label: "Information"
+  |         }],
   |         submit: function(p) {
-  |             console.log("skickar") ;
+  |             DUBBE.ddo.task.create(p) ;
   |         }
   |     }) ;
   |  
