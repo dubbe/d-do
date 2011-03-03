@@ -51,7 +51,6 @@ DUBBE.ajax.set = function(param) {
 
 DUBBE.namespace("DUBBE.ui") ;
 
-// Maybe should use jQuery UI instead...
 
 DUBBE.ui.drag = function(param){
 
@@ -62,5 +61,5 @@ DUBBE.ui.drop = function(param){
 }
 
 DUBBE.ui.sort = function(param){
-
+    // fix jquery-ui connection
 }

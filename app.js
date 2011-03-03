@@ -5,20 +5,18 @@
 
 var express = require('express'),
     assert = require('assert'),
-    cradle = require('cradle'),
+    //cradle = require('cradle'),
     Task = require('./task').Task,
     Category = require('./category').Category,
     User = require('./user').User ;
 module.exports = express.createServer() ;
 var app = module.exports ;
 
-
-
 // Database
-
+/*
 var db = new(cradle.Connection)().database('d-do');
 
-db.create();
+db.create();*/
 
 // Configuration
 
@@ -47,7 +45,6 @@ app.configure('test', function() {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-//res.send("testar") ;
 // Models
 
 var task = new Task() ;
@@ -57,30 +54,67 @@ var user = new User() ;
 // Routes
 
 // Serve the pages
-app.get('/:page.', function(req, res){
+app.get('/:page?', function(req, res){
     
-    if (!page) {
+    if (!req.params.page) {
         // The dashboard-view
         res.render('index', {
             locals: {
-                title: "D-Do"
+                info: req.params
             }
         })
     }
+
 });
 
+// API
+// Get
+app.get('/api/:model.:format?', function(req, res) {
+    
+    if(!req.params.format || req.params.format == "json") {
+        if(req.params.model === "task") {
 
-// API List
-app.get('/api/:model.:format', function(req, res) {
+            task.render("testar", function(error, task){
+                res.render('tasks/render', {
+                  locals: {
+                    title: "d-Do",
+                    task: task
+                  }
+                });
+              })
+        } else {
+            res.render('error', {
+            locals: {
+                msg: "Cannot give the requested model!"
+            }
+        })
+        }
+    } else {
+        res.render('error', {
+            locals: {
+                msg: "Cannot give the requested format!"
+            }
+        })
+    }
+
 });
 
 // Create 
-app.post('/api/:model.:format?', function(req, res) {
+app.get('/api/save/:model', function(req, res) {
+    task.create({
+        title: req.param('title'),
+        body: req.param('body'),
+        type: "task"
+    }, function(error, task) {
+        res.partial('tasks/render', {
+          collection: {
+            title: task.title,
+            task: task.body
+          }
+        });
+    });
 });
-
-// Read
-app.get('/api/:model/:id.:format?', function(req, res) {
-});
+/*
 
 // Update
 app.put('/api/:model/:id.:format?', function(req, res) {
@@ -88,7 +122,7 @@ app.put('/api/:model/:id.:format?', function(req, res) {
 
 // Delete
 app.del('/api/:model/:id.:format?', function(req, res) {
-});
+}); */
 
 // Only listen on $ node app.js
 

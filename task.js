@@ -1,10 +1,22 @@
-Task = function() {} ;
+var cradle = require('cradle');
 
-Task.prototype.create = function(data, callback) {
-    
+Task = function(host, port) {
+    this.connection = new(cradle.Connection)(host, port, {
+        cache: true,
+        raw: false
+    });
+    this.db = this.connection.database('d-do') ;
+} ;
+
+Task.prototype.create = function(task, callback) {
+    this.db.save(task, function(error, result) {
+      if( error ) callback(error)
+      else callback(null, task);
+    });
 }
-Task.prototype.render = function(task, callback) {
-    callback(null, this.dummyData[task]) ;
+
+Task.prototype.render = function(data, callback) {
+    callback(null, data) ;
 }
 Task.prototype.update = function(task, data, callback) {
 }

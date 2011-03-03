@@ -2,4 +2,4 @@ User = function() {} ;
 
 // CRUD
 
-exports.Category = User ;
+exports.User = User ;
