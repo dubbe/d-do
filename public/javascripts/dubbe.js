@@ -37,10 +37,48 @@ DUBBE.utils.createButton = function(param){
 DUBBE.namespace("DUBBE.form") ;
 
 DUBBE.form.create = function(param){
+    
+    var form, d = document  ;
+    var name = (param.name) ? param.name : "form" ;
+    var parent = (param.parent) ? $("#"+param.parent) : $("body") ;
+    var submitText = (param.submitText) ? param.submitText : "submit" ;
+    
+    form = $("<form>").appendTo(parent).attr("name", name) ;
+    
+    if(param.fields) {
+        for (i = 0; i < param.fields.length; i += 1) {
+            var type = (param.fields[i].type) ? param.fields[i].type : "input" ;
+            var value = (param.fields[i].value) ? param.fields[i].value : "" ;
+            var label = (param.fields[i].label) ? param.fields[i].label+": " : param.fields[i].name+": " ;
+            
+            $("<label>").attr({
+                for: param.fields[i].name
+            }).appendTo(form).text(label) ;
+            
+            $("<input>").attr({
+                type: type,
+                name: param.fields[i].name,
+                value: value 
+            }).appendTo(form) ;
+            
+        }
+    }
+    
+    if (param.submit) {
+        var input = $("<input>").attr({
+                type: "submit",
+                value: submitText
+        }).appendTo(form) ;
+        
+        $(input).click(function(e) {
+            e.preventDefault(e) ;
+            param.submit(e) ;
+        }) ;
+    }
 
 }
 
-DUBBE.ajax("DUBBE.ajax") ;
+DUBBE.namespace("DUBBE.ajax") ;
 
 DUBBE.ajax.get = function(param) {
     
