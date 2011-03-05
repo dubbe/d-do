@@ -13,19 +13,30 @@ DUBBE.ddo.user = {
 }
 
 DUBBE.ddo.task = {
+    
+    
+    
     create: function(task) {
-        console.log("create")
+        
+        var data = "" ;
+        
+        $.each(task, function(i, val) {
+            data += i + "=" + $(val).val() + "&" ;
+           
+        }) ;
+         
+        var that = this ;
         $.ajax({
             type: "POST",
             url: "/api/task",
-            data: "title="+$(task.name).val()+"&body="+$(task.info).val(),
+            data: data,
             success: function(msg) {
-                console.log(msg) ;
+                that.render(msg) ;
             }
         })
     },
     render: function(task) {
-        console.log("render") ;
+        $("<div>").html("<b>"+task.title+"</b><br />"+task.info).appendTo("body") ;
     },
     renderAll: function() {
         
