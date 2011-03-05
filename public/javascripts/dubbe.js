@@ -87,7 +87,9 @@ DUBBE.form.create = function(param){
         DUBBE.utils.createButton({
             text: submitText,
             fn: function(){
+                
                 param.submit(inputs) ;
+                $(form)[0].reset() ;
             }                
             
         }).appendTo(form) ;
