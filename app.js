@@ -47,7 +47,7 @@ app.configure('test', function() {
 
 // Models
 
-var task = new Task() ;
+var taskModel = new Task() ;
 var category = new Category() ;
 var user = new User() ;
 
@@ -74,13 +74,12 @@ app.get('/api/:model.:format?', function(req, res) {
     if(!req.params.format || req.params.format == "json") {
         if(req.params.model === "task") {
 
-            task.render("testar", function(error, task){
-                var output = {title: "testar", body: "testar2"} ;
-                var body = JSON.stringify(output) ;   
+            taskModel.render("testar", function(error, task){
+                var body = JSON.stringify(task) ;   
                 
                 res.writeHead(200, {
                     'Content-type': 'application/json',
-                    'Content-length': body.length,
+                    'Content-length': body.length
                     
                 })
                 res.end(body) ;
@@ -105,25 +104,22 @@ app.get('/api/:model.:format?', function(req, res) {
 // Create 
 app.post('/api/:model', function(req, res) {
     
-    task.create({
+    taskModel.create({
         title: req.param('title'),
-        body: req.param('body'),
+        info: req.param('info'),
         type: "task"
     }, function(error, task) {
-        res.partial('tasks/render', {
-          collection: {
-            title: task.title,
-            task: task.body
-          }
-        });
+
+        res.writeHead(200, {
+            'Content-type': 'application/json',
+            'Content-length': JSON.stringify(task).length
+        })
+    
+        res.end(JSON.stringify(task)) ;
+        
+        
     });
-   
-   res.writeHead(200, {
-        'Content-type': 'text/plain'
-    })
-    
-    res.end('Success (should replace for json-object?') ;
-    
+
     return ;
    
 });
