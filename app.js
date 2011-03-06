@@ -1,6 +1,6 @@
 var fbId= "167696906616095";
 var fbSecret= "cc7a919fca15b42267ae674b2fc89bc9";
-var fbCallbackAddress= "http://localhost:8080"; 
+var fbCallbackAddress= "vpn.dubbe.se:8080"; 
 /**
  * Module dependencies.
  */
