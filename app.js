@@ -1,6 +1,6 @@
 var fbId= "167696906616095";
 var fbSecret= "cc7a919fca15b42267ae674b2fc89bc9";
-var fbCallbackAddress= "http://vpn.dubbe.se/"; 
+var fbCallbackAddress= "http://vpn.dubbe.se/signin"; 
 /**
  * Module dependencies.
  */
@@ -65,20 +65,21 @@ app.get('/signin', function(req,res) {
    });
 });
 
-app.get('/login', function(req, res){
-  var sign_in_link= "/signin?method=facebook&redirectUrl=" + escape(req.url);
-  if( req.isAuthenticated() ) {
-    res.send('<html><body><h1>Signed in with Facebook</h1></body></html>')
-  }
-  else {
-    res.send('<html><body><a href="'+ sign_in_link + '">Sign in with Facebook</a></body></html>')
-  }
-});
-
 // Routes
 
 // Serve the pages
 app.get('/:page?', function(req, res){
+    
+    // Header
+    
+    var sign_in_link= "/signin?method=facebook&redirectUrl=" + escape(req.url);
+    if( req.isAuthenticated() ) {
+        res.send('<h1>Signed in with Facebook</h1>')
+    }
+    else {
+        res.send('<a href="'+ sign_in_link + '">Sign in with Facebook</a>')
+    }
+    
     
     if (!req.params.page) {
         // The dashboard-view
