@@ -162,7 +162,7 @@ app.del('/api/:model/:id.:format?', function(req, res) {
 
 
 if (!module.parent) {
-  app.listen(80);
+  app.listen(8080);
   
   console.log("Express server listening on port %d", app.address().port)
 }
