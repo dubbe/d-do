@@ -1,32 +1,39 @@
-
+var fbId= "167696906616095";
+var fbSecret= "cc7a919fca15b42267ae674b2fc89bc9";
+var fbCallbackAddress= "http://localhost:8080"; 
 /**
  * Module dependencies.
  */
 
 var express = require('express'),
-    assert = require('assert'),
-    //JSON = require('JSON'),
+    assert = require('assert') ,
+    connect = require('connect'),
+    crypto = require('crypto'),
+    auth= require('connect-auth'),
     Task = require('./task').Task,
     Category = require('./category').Category,
     User = require('./user').User ;
-module.exports = express.createServer() ;
-var app = module.exports ;
+var app = express.createServer(
+    express.bodyDecoder(),
+    express.staticProvider(__dirname + '/public'),
+    express.methodOverride(),
+    connect.cookieDecoder(),
+    connect.session({ secret: 'testar' }),
+    auth( [
+        auth.Facebook({appId : fbId, appSecret: fbSecret, scope: "email", callback: fbCallbackAddress})
+    ]) 
+) ;
 
-// Database
-/*
-var db = new(cradle.Connection)().database('d-do');
-
-db.create();*/
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+app.use(app.router);
 
 // Configuration
 
 app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.bodyDecoder());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.staticProvider(__dirname + '/public'));
+
+  
+  //app.use();
  
 });
 
@@ -50,6 +57,23 @@ app.configure('test', function() {
 var taskModel = new Task() ;
 var category = new Category() ;
 var user = new User() ;
+
+app.get('/signin', function(req,res) {
+  req.authenticate([req.param('method')], function(error, authenticated) { 
+    // You might be able to get away with the referrer here... 
+    res.redirect(req.param('redirectUrl'))
+   });
+});
+
+app.get('/login', function(req, res){
+  var sign_in_link= "/signin?method=facebook&redirectUrl=" + escape(req.url);
+  if( req.isAuthenticated() ) {
+    res.send('<html><body><h1>Signed in with Facebook</h1></body></html>')
+  }
+  else {
+    res.send('<html><body><a href="'+ sign_in_link + '">Sign in with Facebook</a></body></html>')
+  }
+});
 
 // Routes
 
@@ -135,7 +159,12 @@ app.del('/api/:model/:id.:format?', function(req, res) {
 
 // Only listen on $ node app.js
 
+
+/*
 if (!module.parent) {
   app.listen(8080);
+  
   console.log("Express server listening on port %d", app.address().port)
 }
+
+*/

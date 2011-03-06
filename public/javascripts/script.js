@@ -51,3 +51,25 @@ DUBBE.ddo.task = {
 DUBBE.ddo.category = {
     // some kind of crud
 }
+
+
+$(document).ready(function() {
+
+    DUBBE.form.create({
+        name: "testar",
+        parent: "testar",
+        fields: [{
+            name: "title",
+            type: "input",
+            label: "Namn"   
+        }, {
+            name: "info",
+            type: "text",
+            label: "Information"
+        }],
+        submit: function(p) {
+        DUBBE.ddo.task.create(p) ;
+        }
+    }) ;
+
+});
