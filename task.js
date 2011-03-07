@@ -17,7 +17,7 @@ Task.prototype.create = function(task, callback) {
                 if (doc.type == 'task') {
                     emit(null, doc);
                 }
-            }
+            } 
         }
     });
     

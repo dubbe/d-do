@@ -1,6 +1,6 @@
 var fbId= "167696906616095";
 var fbSecret= "cc7a919fca15b42267ae674b2fc89bc9";
-var fbCallbackAddress= "http://vpn.dubbe.se/signin"; 
+var fbCallbackAddress= "http://vpn.dubbe.se/auth/facebook"; 
 /**
  * Module dependencies.
  */
@@ -10,6 +10,7 @@ var express = require('express'),
     connect = require('connect'),
     crypto = require('crypto'),
     auth= require('connect-auth'),
+    oauth= require('oauth'),
     Task = require('./task').Task,
     Category = require('./category').Category,
     User = require('./user').User ;
@@ -25,6 +26,7 @@ var app = express.createServer(
 ) ;
 
 app.set('views', __dirname + '/views');
+app.set('partials'   , __dirname + '/views/partials');
 app.set('view engine', 'jade');
 app.use(app.router);
 
@@ -56,45 +58,68 @@ app.configure('test', function() {
 
 var taskModel = new Task() ;
 var category = new Category() ;
-var user = new User() ;
+var userModel = new User() ;
 
-app.get('/signin', function(req,res) {
-  req.authenticate([req.param('method')], function(error, authenticated) { 
-    // You might be able to get away with the referrer here... 
-    res.redirect(req.param('redirectUrl'))
-   });
+
+// header
+
+
+app.get("/", function(req, res, params){
+    res.render('login', {
+        layout:false,
+        locals: { errorMessage: "Error: password wrong." }
+    });
 });
+
+app.get('/auth/facebook', function(req,res) {
+    
+    var sess = req.session ;
+    
+    req.authenticate(['facebook'], function(error, authenticated) {
+        if (authenticated) {
+            userModel.create({
+                name: req.getAuthDetails().user['name'],
+                fbId: req.getAuthDetails().user['id'],
+                email: req.getAuthDetails().user['email'], 
+                type: "user",
+                latestLogin: new Date() 
+            }, function(error, task){
+                if (!error) {
+                    sess.userid = task['id'] ;
+                    console.log(task) ;
+                    res.redirect("http://vpn.dubbe.se/dashboard"); 
+                }
+                
+            });
+        }
+        
+    }) ;
+});
+
 
 // Routes
 
 // Serve the pages
-app.get('/:page?', function(req, res){
-    
-    // Header
-    
-    var sign_in_link= "/signin?method=facebook&redirectUrl=" + escape(req.url);
+app.get('/dashboard', function(req, res){
+
     if( req.isAuthenticated() ) {
-        res.send('<h1>Signed in with Facebook</h1>')
+        res.render('index', {
+        locals: {
+            info: req.params
+        }
+    }) ;
     }
     else {
-        res.send('<a href="'+ sign_in_link + '">Sign in with Facebook</a>')
-    }
-    
-    
-    if (!req.params.page) {
-        // The dashboard-view
-        res.render('index', {
-            locals: {
-                info: req.params
-            }
-        })
-    }
+        res.redirect("http://vpn.dubbe.se/")
+    } 
+
 
 });
 
 // API
 // Get
 app.get('/api/:model.:format?', function(req, res) {
+    
     
     if(!req.params.format || req.params.format == "json") {
         if(req.params.model === "task") {
@@ -128,11 +153,14 @@ app.get('/api/:model.:format?', function(req, res) {
 
 // Create 
 app.post('/api/:model', function(req, res) {
-    
+    var sess = req.session ;
+    console.log(sess.userid) ;
     taskModel.create({
         title: req.param('title'),
         info: req.param('info'),
-        type: "task"
+        type: "task",
+        user: sess.userid,
+        created: new Date()
     }, function(error, task) {
 
         res.writeHead(200, {
@@ -152,7 +180,7 @@ app.post('/api/:model', function(req, res) {
 
 // Update
 app.put('/api/:model/:id.:format?', function(req, res) {
-});
+}); 
 
 // Delete
 app.del('/api/:model/:id.:format?', function(req, res) {
