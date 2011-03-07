@@ -53,20 +53,32 @@ app.configure('test', function() {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-app.dynamicHelpers(require('./helpers/helpers.js').dynamicHelpers);
-
-
 // Models
 
 var taskModel = new Task() ;
 var category = new Category() ;
 var userModel = new User() ;
 
+// Helpers
+
+app.dynamicHelpers({
+    
+    session: function(req, res){
+        //console.log(req.session) ;
+        return req.session ;
+    },
+    user: function(req, res) {
+         return userModel.get(req.session.userid) ;
+    }
+});
+
+
+
+
 
 // header
 
 app.get("/", function(req, res, params){
-    
     res.render('index', {
         locals: {
             info: req.params
@@ -75,9 +87,7 @@ app.get("/", function(req, res, params){
 });
 
 app.get('/auth/facebook', function(req,res) {
-    
-    var sess = req.session ;
-    
+
     req.authenticate(['facebook'], function(error, authenticated) {
         if (authenticated) {
             userModel.create({
@@ -85,11 +95,11 @@ app.get('/auth/facebook', function(req,res) {
                 fbId: req.getAuthDetails().user['id'],
                 email: req.getAuthDetails().user['email'], 
                 type: "user",
-                latestLogin: new Date() 
+                latestLogin: new Date(),
+                latestLoginType: "facebook" 
             }, function(error, task){
                 if (!error) {
-                    sess.userid = task['id'] ;
-                    console.log(task) ;
+                    req.session.userid = task['id'] ;
                     res.redirect("http://vpn.dubbe.se/"); 
                 }
                 
@@ -99,25 +109,6 @@ app.get('/auth/facebook', function(req,res) {
     }) ;
 });
 
-
-// Routes
-
-// Serve the pages
-app.get('/dashboard', function(req, res){
-
-    if( req.isAuthenticated() ) {
-        res.render('index', {
-        locals: {
-            info: req.params
-        }
-    }) ;
-    }
-    else {
-        res.redirect("http://vpn.dubbe.se/")
-    } 
-
-
-});
 
 // API
 // Get
@@ -156,27 +147,30 @@ app.get('/api/:model.:format?', function(req, res) {
 
 // Create 
 app.post('/api/:model', function(req, res) {
-    var sess = req.session ;
-    console.log(sess.userid) ;
-    taskModel.create({
-        title: req.param('title'),
-        info: req.param('info'),
-        type: "task",
-        user: sess.userid,
-        created: new Date()
-    }, function(error, task) {
-
-        res.writeHead(200, {
-            'Content-type': 'application/json',
-            'Content-length': JSON.stringify(task).length
-        })
+    console.log(req.params.model) ;
     
-        res.end(JSON.stringify(task)) ;
+    if (req.params.model == "task") {
+        taskModel.create({
+            title: req.param('title'),
+            info: req.param('info'),
+            type: "task",
+            user: req.session.userid,
+            created: new Date()
+        }, function(error, task){
         
+            res.writeHead(200, {
+                'Content-type': 'application/json',
+                'Content-length': JSON.stringify(task).length
+            })
+            
+            res.end(JSON.stringify(task));
+            
+            
+        });
+    } else if (model == "project") {
         
-    });
+    }
 
-    return ;
    
 });
 /*

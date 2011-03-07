@@ -36,7 +36,6 @@ User.prototype.create = function(user, callback) {
         }
         
         if (id === false) {
-            console.log("save") ;
             that.db.save(user, function(error, result){
             if (error) {
                 callback(error)
@@ -69,13 +68,19 @@ User.prototype.create = function(user, callback) {
         }
     
     }) ;
-    
-    
-    
-    
-    
-    
 }
+
+User.prototype.get = function(id){
+    
+    return this.db.get(id, function (error, result) {
+        
+        if(!error) {
+            return result ;
+        } 
+    
+    }); 
+}
+
 // CRUD
 
 exports.User = User ;

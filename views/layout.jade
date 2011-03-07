@@ -10,9 +10,8 @@ html
   body
   
   h1= "d-Do" 
-  
-  - if (users.loggedIn)
-    p.login Du är inloggad som #{users.name}
+  - if (session.userid)
+    p.login Du är inloggad som #{user.name} med #{user.latestLoginType}
   - else
     a(href: '/auth/facebook').login Logga in med facebook
     
