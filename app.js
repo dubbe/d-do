@@ -26,7 +26,6 @@ var app = express.createServer(
 ) ;
 
 app.set('views', __dirname + '/views');
-app.set('partials'   , __dirname + '/views/partials');
 app.set('view engine', 'jade');
 app.use(app.router);
 
@@ -54,6 +53,9 @@ app.configure('test', function() {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
+app.dynamicHelpers(require('./helpers/helpers.js').dynamicHelpers);
+
+
 // Models
 
 var taskModel = new Task() ;
@@ -63,12 +65,13 @@ var userModel = new User() ;
 
 // header
 
-
 app.get("/", function(req, res, params){
-    res.render('login', {
-        layout:false,
-        locals: { errorMessage: "Error: password wrong." }
-    });
+    
+    res.render('index', {
+        locals: {
+            info: req.params
+        }
+    }) ;
 });
 
 app.get('/auth/facebook', function(req,res) {
@@ -87,7 +90,7 @@ app.get('/auth/facebook', function(req,res) {
                 if (!error) {
                     sess.userid = task['id'] ;
                     console.log(task) ;
-                    res.redirect("http://vpn.dubbe.se/dashboard"); 
+                    res.redirect("http://vpn.dubbe.se/"); 
                 }
                 
             });
