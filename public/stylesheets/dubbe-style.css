@@ -66,17 +66,17 @@ body {
      -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
      text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
      border-bottom: 1px solid rgba(0,0,0,0.25);
+     
+     color: #fff ;
+     font-size: 10px ;
+     font-weight: bold ;
+     text-decoration: none ;
+     
 }
 .button:hover {
      top: 1px ;
      -moz-box-shadow: 0 1px 1px rgba(0,0,0,0);
      -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0);
-}
-.button a {
-     color: #fff ;
-     font-size: 10px ;
-     font-weight: bold ;
-     text-decoration: none ;
 }
 label {
     color: #000 ;

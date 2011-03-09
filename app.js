@@ -13,6 +13,7 @@ var express = require('express'),
     oauth= require('oauth'),
     Task = require('./task').Task,
     Category = require('./category').Category,
+    Project = require('./project').Project,
     User = require('./user').User ;
 var app = express.createServer(
     express.bodyDecoder(),
@@ -56,6 +57,7 @@ app.configure('test', function() {
 // Models
 
 var taskModel = new Task() ;
+var projectModel = new Project() ;
 var category = new Category() ;
 var userModel = new User() ;
 
@@ -118,15 +120,23 @@ app.get('/api/:model.:format?', function(req, res) {
     if(!req.params.format || req.params.format == "json") {
         if(req.params.model === "task") {
 
-            taskModel.render("testar", function(error, task){
+            taskModel.render(req.session.userid, req.param, function(error, task){
                 var body = JSON.stringify(task) ;   
                 
-                res.writeHead(200, {
-                    'Content-type': 'application/json',
-                    'Content-length': body.length
+                if (body) {
+                    res.writeHead(200, {
+                        'Content-type': 'application/json',
+                        'Content-length': body.length
                     
-                })
-                res.end(body) ;
+                    })
+                    res.end(body);
+                } else {
+                    res.writeHead(400, {
+                        'Content-type': 'application/json'
+                    
+                    })
+                    res.end("error");
+                }
             })
         } else {
             res.render('error', {
@@ -146,32 +156,22 @@ app.get('/api/:model.:format?', function(req, res) {
 });
 
 // Create 
-app.post('/api/:model', function(req, res) {
-    console.log(req.params.model) ;
-    
-    if (req.params.model == "task") {
-        taskModel.create({
-            title: req.param('title'),
-            info: req.param('info'),
-            type: "task",
-            user: req.session.userid,
-            created: new Date()
-        }, function(error, task){
-        
-            res.writeHead(200, {
-                'Content-type': 'application/json',
-                'Content-length': JSON.stringify(task).length
-            })
-            
-            res.end(JSON.stringify(task));
-            
-            
-        });
-    } else if (model == "project") {
-        
-    }
-
+app.post('/api', function(req, res) {
    
+    console.log(req.body) ;
+   
+    taskModel.create(req.body, function(error, task){
+    
+        res.writeHead(200, {
+            'Content-type': 'application/json',
+            'Content-length': JSON.stringify(task).length
+        })
+        
+        res.end(JSON.stringify(task));
+        
+        
+    });
+  
 });
 /*
 
