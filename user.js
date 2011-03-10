@@ -69,7 +69,6 @@ User.prototype.create = function(user, callback) {
 
         });
         } else {
-            console.log(id) ;
             that.db.merge(id, user, function(error, result){
                 if (error) {
                     callback(error)

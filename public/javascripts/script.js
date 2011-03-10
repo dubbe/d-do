@@ -1,5 +1,28 @@
 DUBBE.namespace("DUBBE.ddo") ;
 
+DUBBE.ddo.user = {
+    get: function(userId) {
+        
+        var that = this ;
+        var resp ;
+        
+        $.ajax({
+            type: "GET",
+            url: "/api/user/"+userId,
+            async: false,
+            success: function(user) {
+               resp = user ;         
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                console.log(xhr.status);
+                console.log(thrownError);
+            }  
+        });
+
+    return resp ;
+    }
+}
+
 /**
  * Functions for tasks specifically
  * @param {Object} task
@@ -10,15 +33,21 @@ DUBBE.ddo.task = {
  
     
     render: function(task, parent) {
-        $("<div>").addClass("task").html("<p><b>"+task.title+"</b><br />"+task.info+"</p>").appendTo(parent) ;
+        
+        parent = (task.userId) ? $("#"+task.userId) : parent ;
+        
+        $("<li>").addClass("task").attr("id", task._id).appendTo(parent).html("<p><b>"+task.title+"</b><br />"+task.info+"</p>") ;
+    
     },
     renderAll: function(param) {
 
         var that = this ;
+        console.log(param) ;
         
         $.ajax({
             type: "GET",
-            url: "/api/task/"+param.parent,
+            url: "/api/task/",
+            data: "parent="+param.parent,
             success: function(tasks) {
                 for (var i in tasks) {
                     that.render(tasks[i], param.parentElem) ;
@@ -34,6 +63,19 @@ DUBBE.ddo.task = {
     },
     update: function() {
         
+    },
+    assign: function(param) {
+        
+        var data = "userId="+param.userId ;
+        
+        $.ajax({
+            type: "PUT",
+            url: "/api/task/"+param.taskId,
+            data: data,
+            success: function(msg) {
+                console.log("yeah!") ;
+            }
+        })
     }
     
     
@@ -50,8 +92,61 @@ DUBBE.ddo.project = {
      * @param {Object} project
      */
     render: function(project) {
-        console.log(project) ;
-        var projectDiv = $("<div>").addClass("project").html("<p><b>"+project.title+"</b><br />"+project.info+"</p>").appendTo("body").append(
+        var that = this ;
+        $("<li>").append(
+            $("<a>").addClass("project").text(project.title).appendTo($("#projectList"))
+        ) ;
+        
+        $("#projectList").append(
+            $("<li>").append(
+                $("<a>").text(project.title)
+            ).hover(function() {
+                $(this).css('cursor','pointer') ;
+            }).click(function() {
+                that.renderDashboard(project)
+            })
+         );
+         
+    },
+    /**
+     * Loops through all projects and renders them using render
+     */
+    renderAll: function(){
+        
+        var that = this ;
+        
+        $.ajax({
+            type: "GET",
+            url: "/api/project",
+            success: function(projects) {
+                for (var i in projects) {
+                    that.render(projects[i]) ;
+                }
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                console.log(xhr.status);
+                console.log(thrownError);
+            }  
+        }); 
+    },
+    renderDashboard: function(project) {
+        
+        $("#users").empty() ;
+        $("#tasks").empty() ;
+        
+        
+        for (i in project.teamMember) {
+
+            $("#users").append(
+                $("<h2>").text(DUBBE.ddo.user.get(project.teamMember[i]).name)
+            ).append(
+                $("<ul>").addClass("sortable").attr("id", project.teamMember[i])
+            )
+        }
+        
+        var div = $("<ul>").appendTo("#tasks").addClass("sortable") ;
+        
+        var tasks = $("#tasks").append(
             $("<a>").click(function(e) {
                 e.preventDefault() ;
         
@@ -79,48 +174,32 @@ DUBBE.ddo.project = {
                                         data: p,
                                         model: "task",
                                         parent: project._id,
-                                        parentElem: projectDiv
+                                        parentElem: div
                                     }) ;
                                 },    
                                 submitText: "Spara"
                             }) 
-                    }) ;
-            }).text("Skapa task").attr("href", "#") 
-        ) ;
+                    }) 
+            }).text("Skapa task").attr("href", "#")) ;
         
-        /** 
-         * Renders all tasks to this project
-         */
         DUBBE.ddo.task.renderAll({
-            parentElem: projectDiv,
+            parentElem: div,
             parent: project._id
-        }) ;
+        })
         
-    },
-    /**
-     * Loops through all projects and renders them using render
-     */
-    renderAll: function(){
+        $(".sortable").sortable({
+            connectWith: ".sortable",
+            receive: function(event, ui) {
+                DUBBE.ddo.task.assign({
+                    taskId: $(ui.item).attr("id"),
+                    userId: $(this).attr("id")
+                })
+            }
+        }).disableSelection();        
         
-        var that = this ;
-        
-        console.log("testar") ;
-        
-        $.ajax({
-            type: "GET",
-            url: "/api/project",
-            success: function(projects) {
-                for (var i in projects) {
-                    that.render(projects[i]) ;
-                }
-            },
-            error:function (xhr, ajaxOptions, thrownError){
-                console.log(xhr.status);
-                console.log(thrownError);
-            }  
-        }); 
     }
 } 
+
 
 /**
  * Some generic functions to be used with ajax. 
@@ -141,7 +220,7 @@ DUBBE.ddo.ajax = {
        }
     } ,
     /**
-     * Function to take the ouptu from the form and send it to the api
+     * Function to take the output from the form and send it to the api
      */
     create: function(param) {
         
@@ -181,6 +260,7 @@ DUBBE.ddo.ajax = {
 
 
 $(document).ready(function() {
+    
     
     
     DUBBE.ddo.project.renderAll() ;

@@ -11,17 +11,17 @@ html
     script(type='text/javascript', src='/javascripts/script.js') 
     
   body
-  
-  h1= "d-Do" 
-  - if (session.userid)
-    p.login Du är inloggad som #{user.name} med #{user.latestLoginType}
-  - else
-    a(href: '/auth/facebook').login Logga in med facebook
-    
-  br
-  - if (session.userid) 
-    a(href: '#')#createProject Skapa projekt
+  #container
+    #header
+      #login
+        - if (session.userid)
+          p.login Du är inloggad som #{user.name} med #{user.latestLoginType}
+        - else
+          a(href: '/auth/facebook').login Logga in med Facebook
+      h1= "d-Do"
+    div.clr
+
 
     
     
-  != body
+    != body

@@ -61,11 +61,19 @@ app.dynamicHelpers({
  */
 
 app.get("/", function(req, res, params){
-    res.render('index', {
-        locals: {
-            info: req.params
-        }
-    }) ;
+    if(req.isAuthenticated()) {
+        res.render('index', {
+            locals: {
+                info: req.params
+            }
+        });
+    } else {
+        res.render('login', {
+            locals: {
+                info: req.params
+            }
+        });
+    }
 });
 
 
@@ -79,29 +87,56 @@ app.get("/", function(req, res, params){
  * 
  */
 
-app.get('/api/:model/:parent?.:format?', function(req, res) {
+app.get('/api/:model/:id?.:format?', function(req, res) {
 
+   console.log(req.query) ;
+   
+   if(req.query.parent) {
+       req.params.parent = req.query.parent ;
+   }
+   
+    
     if(!req.params.format || req.params.format == "json") {
-
-        objectModel.render(req.params, function(error, task){
-            var body = JSON.stringify(task) ;   
-            
-            if (body) {
-                res.writeHead(200, {
-                    'Content-type': 'application/json',
-                    'Content-length': body.length
-                
-                })
-                res.end(body);
-            } else {
-                res.writeHead(404, {
-                    'Content-type': 'application/text'
-                
-                })
-                res.end("No information!");
-            }
-        })
-
+         if (req.params.id) {
+             objectModel.render(req.params.id, function(error, task){
+                 var body = JSON.stringify(task);
+                 if (body) {
+                     res.writeHead(200, {
+                         'Content-type': 'application/json',
+                         'Content-length': body.length
+                     
+                     })
+                     res.end(body);
+                 }
+                 else {
+                     res.writeHead(404, {
+                         'Content-type': 'application/text'
+                     
+                     })
+                     res.end("No information!");
+                 }
+             })
+         } else {
+         
+             objectModel.renderAll(req.params, function(error, task){
+                 var body = JSON.stringify(task);
+                 if (body) {
+                     res.writeHead(200, {
+                         'Content-type': 'application/json',
+                         'Content-length': body.length
+                     
+                     })
+                     res.end(body);
+                 }
+                 else {
+                     res.writeHead(404, {
+                         'Content-type': 'application/text'
+                     
+                     })
+                     res.end("No information!");
+                 }
+             })
+         }
     } else {
         res.writeHead(400, {
             'Content-type': 'application/text'
@@ -123,8 +158,12 @@ app.post('/api/:model?', function(req, res) {
     req.body.createdBy = req.session.userid ;
     req.body.created = new Date() ;
     
+    
     if(req.params.model) {
         req.body.type = req.params.model ;
+    }
+    if(req.body.type == "project") {
+        req.body.teamMember = [req.session.userid] ;
     }
    
     objectModel.create(req.body, function(error, task){
@@ -153,12 +192,36 @@ app.post('/api/:model?', function(req, res) {
     });
   
 });
-/*
+
 
 // Update
 app.put('/api/:model/:id.:format?', function(req, res) {
-}); 
+    console.log("update") ;
+    
+    objectModel.update(req.params.id, req.body, function(error, obj){
 
+        console.log(obj) ;
+    
+        if (obj) {
+            res.writeHead(200, {
+                'Content-type': 'application/json',
+                'Content-length': JSON.stringify(obj).length
+            })
+            
+            res.end(JSON.stringify(obj));
+        } else {
+            res.writeHead(404, {
+                'Content-type': 'application/text'
+            
+            })
+            res.end("No information!");
+        }
+        
+        
+    });
+    
+}); 
+/*
 // Delete
 app.del('/api/:model/:id.:format?', function(req, res) {
 }); */

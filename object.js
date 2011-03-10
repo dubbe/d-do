@@ -28,12 +28,20 @@ ObjectModel.prototype.create = function(obj, callback) {
         that = this
 
 
-    var type = obj.type ;
+    console.log(obj.type) ;
     
-    allFunction = function(doc){
-       if (doc.type == type) {
-           emit(null, doc);
-       }
+    if (obj.type == "project") {
+        allFunction = function(doc){
+            if (doc.type == "project") {
+                emit(null, doc);
+            }
+        }
+    } else if (obj.type == "task") {
+        allFunction = function(doc){
+            if (doc.type == "task") {
+                emit(null, doc);
+            }
+        }
     }
    
    
@@ -56,12 +64,11 @@ ObjectModel.prototype.create = function(obj, callback) {
     });
 }
 /**
- * Generic function to render object/objects from the database
+ * Generic function to render objects from the database
  * @param {Object} obj
  * @param {Object} callback
  */
-ObjectModel.prototype.render = function(obj, callback) {
-
+ObjectModel.prototype.renderAll = function(obj, callback) {
 
     this.db.view(obj.model + '/all',function(error, result) {
         if( error ){
@@ -78,6 +85,35 @@ ObjectModel.prototype.render = function(obj, callback) {
 
             callback(null, docs);
         } 
+    });
+}
+
+/**
+ * Generic function to render object from the database
+ * @param {Object} obj
+ * @param {Object} callback
+ */
+ObjectModel.prototype.render = function(id, callback) {
+
+    this.db.get(id, function(error, result) {
+        if( error ){
+            callback(error)
+        }else{
+
+            callback(null, result);
+        } 
+    });
+}
+
+ObjectModel.prototype.update = function(id, obj, callback){
+    console.log(id) ;
+    this.db.merge(id, obj, function(error, result){
+        if (error) {
+            callback(error)
+        }
+        else {
+            callback(null, result);
+        }
     });
 }
 

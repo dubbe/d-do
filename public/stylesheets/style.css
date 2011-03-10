@@ -1,8 +1,111 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   background-image: url("stripe.png") ;
+  width: 100% ;
+  padding: 0px ;
+  margin: 0px ;
 }
+#container {
+    margin-top: 0 ;
+    padding: 0 ;
+    width: 1024px ;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+#header {
+    margin: 0px ;
+    float: left ;
+    width: 100% ;
+    
+}
+#login {
+    float: right ;
+    padding: 2px 15px ;
+    background: rgba(132,173,209, .75);
+    background: -moz-linear-gradient(top, rgba(132,173,209, .75), rgba(77,134,161, .75));
+    background: -webkit-gradient( linear, left top, left bottom, from( rgba(132,173,209, .75) ), to( rgba(77,134,161, .75) ) );
+    background: linear-gradient(top, rgba(132,173,209, .75), rgba(77,134,161, .75));
+    filter: progid:DXImageTransform.Microsoft.Gradient( startColorStr='#84add1', endColorStr='#4d86a1', GradientType=0 );
+
+    border: 3px solid #fff;
+    border-top: none;
+    -moz-border-radius: 0px 0px 10px 10px ;
+    -webkit-border-radius: 0px 0px 10px 10px ;
+    border-radius: 0 0 10 10px;
+    
+    -moz-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+     
+}
+#login a, #login p {
+    color: #fff ;
+    text-decoration: none ;
+    font-size: 10px ;
+    font-weight: bold ;
+    margin: 2px ;
+    padding: 0 ;
+}
+#projectList {
+    padding: 0;
+    margin: 0 ;
+}
+#projectList li {
+    padding: 10px ;
+    margin: 5px ;
+    list-style-type: none ;
+    float: left ;
+    
+    background: rgba(132,173,209, .75);
+    background: -moz-linear-gradient(top, rgba(132,173,209, .75), rgba(77,134,161, .75));
+    background: -webkit-gradient( linear, left top, left bottom, from( rgba(132,173,209, .75) ), to( rgba(77,134,161, .75) ) );
+    background: linear-gradient(top, rgba(132,173,209, .75), rgba(77,134,161, .75));
+    filter: progid:DXImageTransform.Microsoft.Gradient( startColorStr='#84add1', endColorStr='#4d86a1', GradientType=0 );
+
+    border: 3px solid #fff;
+    
+    -moz-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+}
+#projectList li:hover {
+    border: 3px solid #000;
+}
+#projectList li a {
+    color: #fff ;
+    text-decoration: none ;
+    font-size: 14px ;
+    font-weight: bold ;
+}
+
+#users {
+    float: left ;
+    width: 600px ;
+}
+#tasks {
+    float: right ;
+    width: 300px ;
+}
+#users ul, #tasks ul {
+    border: 1px solid #000 ;
+    float: left;
+    width: 100% ;
+    
+    padding: 10px ;
+    margin: 5px ;
+    list-style-type: none ;
+    float: left ;
+    
+    background: rgba(132,173,209, .25);
+
+    border: 3px solid #fff;
+    
+    -moz-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+}
+
+
 
 .task {
     width: 100px ;
@@ -13,4 +116,7 @@ body {
     background: -webkit-gradient(linear, 0% 20%, 0% 1000%, from(#fff), to(#fff), color-stop(.1,#f3f3f3));
     border: 1px solid #ccc;
     -webkit-box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.25);
+}
+.clr  {
+    clear: both ;
 }
