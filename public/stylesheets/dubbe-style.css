@@ -1,6 +1,3 @@
-body {
-     font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
-}
 .popUp {
      position: absolute ;
      padding: 10px ;
@@ -97,7 +94,8 @@ input, textarea {
      margin: 5px ;
      
      border: 1px solid #aaa ;
-
+    
+    font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
 
      /*style the cursor and text of the button*/
      color: #000;

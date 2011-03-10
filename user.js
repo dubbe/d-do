@@ -1,5 +1,10 @@
 var cradle = require('cradle');
 
+/**
+ * Connection to the couchdb-database and creating d-do if it doesn't exist
+ * @param {Object} host
+ * @param {Object} port
+ */
 User = function(host, port) {
     this.connection = new(cradle.Connection)(host, port, {
         cache: true,
@@ -9,6 +14,14 @@ User = function(host, port) {
     this.db.create() ;
 } ;
 
+/**
+ * Writes the user into the couch-db. Creates a view to get all users as well.
+ * 
+ * @param {Object} user
+ * @param {Function} callback
+ * 
+ * @return
+ */
 User.prototype.create = function(user, callback) {
     
     this.db.save('_design/user', {
@@ -69,6 +82,12 @@ User.prototype.create = function(user, callback) {
     
     }) ;
 }
+/**
+ * Gets a user based on the id
+ * @param {Object} id
+ * 
+ * @return the user-object
+ */
 
 User.prototype.get = function(id){
     

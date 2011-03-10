@@ -6,15 +6,15 @@ var fbCallbackAddress= "http://vpn.dubbe.se/auth/facebook";
  */
 
 var express = require('express'),
-    assert = require('assert') ,
     connect = require('connect'),
-    crypto = require('crypto'),
     auth= require('connect-auth'),
     oauth= require('oauth'),
-    Task = require('./task').Task,
-    Category = require('./category').Category,
-    Project = require('./project').Project,
+    ObjectModel = require('./object').ObjectModel,
     User = require('./user').User ;
+    
+/**
+ * Creating the server
+ */
 var app = express.createServer(
     express.bodyDecoder(),
     express.staticProvider(__dirname + '/public'),
@@ -26,42 +26,24 @@ var app = express.createServer(
     ]) 
 ) ;
 
+/**
+ * Setting some configurations for views
+ */
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(app.router);
 
-// Configuration
-
-app.configure(function(){
-
-  
-  //app.use();
- 
-});
-
-app.configure('development', function(){
-  app.use(express.logger()) ;
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-});
-
-app.configure('production', function(){
-  app.use(express.logger()) ;
-  app.use(express.errorHandler()); 
-});
-
-app.configure('test', function() {
-  app.use(express.logger()) ;
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
 
 // Models
 
-var taskModel = new Task() ;
-var projectModel = new Project() ;
-var category = new Category() ;
+//var taskModel = new Task() ;
+var objectModel = new ObjectModel() ;
 var userModel = new User() ;
 
-// Helpers
+/**
+ * Helpers, 
+ * The user is neccisary to validate in the views
+ */
 
 app.dynamicHelpers({
     
@@ -74,11 +56,9 @@ app.dynamicHelpers({
     }
 });
 
-
-
-
-
-// header
+/**
+ * The first page, just loading the index-view for now.
+ */
 
 app.get("/", function(req, res, params){
     res.render('index', {
@@ -88,6 +68,106 @@ app.get("/", function(req, res, params){
     }) ;
 });
 
+
+/**
+ * The pages for the API
+ * GET
+ * 
+ * model is the typ of object (eg. task or project)
+ * parent is the parent for the object (eg. a project for a task)
+ * format could be if we wan't to send the response as something other then json
+ * 
+ */
+
+app.get('/api/:model/:parent?.:format?', function(req, res) {
+
+    if(!req.params.format || req.params.format == "json") {
+
+        objectModel.render(req.params, function(error, task){
+            var body = JSON.stringify(task) ;   
+            
+            if (body) {
+                res.writeHead(200, {
+                    'Content-type': 'application/json',
+                    'Content-length': body.length
+                
+                })
+                res.end(body);
+            } else {
+                res.writeHead(404, {
+                    'Content-type': 'application/text'
+                
+                })
+                res.end("No information!");
+            }
+        })
+
+    } else {
+        res.writeHead(400, {
+            'Content-type': 'application/text'
+        
+        })
+        res.end("Only json is supported.");
+    }
+
+});
+
+/**
+ * Create
+ * 
+ * Model is the type of object to be created
+ * 
+ */
+app.post('/api/:model?', function(req, res) {
+   
+    req.body.createdBy = req.session.userid ;
+    req.body.created = new Date() ;
+    
+    if(req.params.model) {
+        req.body.type = req.params.model ;
+    }
+   
+    objectModel.create(req.body, function(error, task){
+    
+        if (error) {
+            
+            res.writeHead(200, {
+                'Content-type': 'application/json',
+                'Content-length': JSON.stringify(task).length
+            })
+            
+            res.end(JSON.stringify(task));
+            
+            }
+    
+        if (task) {
+            res.writeHead(200, {
+                'Content-type': 'application/json',
+                'Content-length': JSON.stringify(task).length
+            })
+            
+            res.end(JSON.stringify(task));
+        }
+        
+        
+    });
+  
+});
+/*
+
+// Update
+app.put('/api/:model/:id.:format?', function(req, res) {
+}); 
+
+// Delete
+app.del('/api/:model/:id.:format?', function(req, res) {
+}); */
+
+// Only listen on $ node app.js
+
+/**
+ * Authentication, starting with facebook
+ */
 app.get('/auth/facebook', function(req,res) {
 
     req.authenticate(['facebook'], function(error, authenticated) {
@@ -111,81 +191,9 @@ app.get('/auth/facebook', function(req,res) {
     }) ;
 });
 
-
-// API
-// Get
-app.get('/api/:model.:format?', function(req, res) {
-    
-    
-    if(!req.params.format || req.params.format == "json") {
-        if(req.params.model === "task") {
-
-            taskModel.render(req.session.userid, req.param, function(error, task){
-                var body = JSON.stringify(task) ;   
-                
-                if (body) {
-                    res.writeHead(200, {
-                        'Content-type': 'application/json',
-                        'Content-length': body.length
-                    
-                    })
-                    res.end(body);
-                } else {
-                    res.writeHead(400, {
-                        'Content-type': 'application/json'
-                    
-                    })
-                    res.end("error");
-                }
-            })
-        } else {
-            res.render('error', {
-            locals: {
-                msg: "Cannot give the requested model!"
-            }
-        })
-        }
-    } else {
-        res.render('error', {
-            locals: {
-                msg: "Cannot give the requested format!"
-            }
-        })
-    }
-
-});
-
-// Create 
-app.post('/api', function(req, res) {
-   
-    console.log(req.body) ;
-   
-    taskModel.create(req.body, function(error, task){
-    
-        res.writeHead(200, {
-            'Content-type': 'application/json',
-            'Content-length': JSON.stringify(task).length
-        })
-        
-        res.end(JSON.stringify(task));
-        
-        
-    });
-  
-});
-/*
-
-// Update
-app.put('/api/:model/:id.:format?', function(req, res) {
-}); 
-
-// Delete
-app.del('/api/:model/:id.:format?', function(req, res) {
-}); */
-
-// Only listen on $ node app.js
-
-
+/**
+ * Starting the server on port 80
+ */
 
 if (!module.parent) {
   app.listen(80);

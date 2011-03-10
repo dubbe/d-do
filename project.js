@@ -11,10 +11,10 @@ Project = function(host, port) {
 
 Project.prototype.create = function(task, callback) {
    
-    this.db.save('_design/tasks', {
+    this.db.save('_design/'+task.type, {
         all: {
             map: function (doc) {
-                if (doc.type == 'task') {
+                if (doc.type == task.type) {
                     emit(null, doc);
                 }
             } 

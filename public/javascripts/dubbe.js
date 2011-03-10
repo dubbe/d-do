@@ -23,9 +23,15 @@ DUBBE.namespace = function(nsString){
 
     return parent;
 } ;
-
+/**
+ * Namespace
+ */
 DUBBE.namespace("DUBBE.utils") ;
 
+/**
+ * Generic pop-up function.
+ * @param {Object} param
+ */
 DUBBE.utils.popup = function(param){
 
 
@@ -91,7 +97,12 @@ DUBBE.utils.popup = function(param){
     return popup ;
 
 }
-
+/**
+ * Generic create button-function
+ * @param {Object} param
+ * 
+ * Todo: add image? 
+ */
 DUBBE.utils.createButton = function(param){
 
     return $("<a>").attr("href", "#").click(function(e) {
@@ -102,10 +113,13 @@ DUBBE.utils.createButton = function(param){
         );
 
 }
-
+/**
+ * Centers the object relative to the window
+ * @param {Object} obj
+ * 
+ * Todo: center relative to parent?
+ */
 DUBBE.utils.center = function center(obj) {
-    // TODO: comment code
-    // TODO: rewrite this function to be more flexible
 
     $(obj).css({
         top: ($(window).height() / 2) - ($(obj).outerHeight() / 2) + $(window).scrollTop() + "px",
@@ -119,10 +133,12 @@ DUBBE.utils.center = function center(obj) {
     
      
 } ;
-
+/**
+ * Object fills the body and not only the screen, resize on onresize
+ * @param {Object} obj
+ */
 DUBBE.utils.fillScreen = function fillScreen(obj) {
-    // TODO: comment code
-    // TODO: rewrite function to reuse code
+
     $(obj).css({
         top: "0px",
         left: "0px",
@@ -137,12 +153,19 @@ DUBBE.utils.fillScreen = function fillScreen(obj) {
 
 DUBBE.namespace("DUBBE.form") ;
 
+/**
+ * Creates a form and submits it, relies on DUBBE.utils.createButton
+ * @param {Object} param
+ * 
+ * TODO: validation
+ * TODO: select
+ */
+
 DUBBE.form.create = function(param){
     
     var form ;
     var inputs = {}  ;
     var name = (param.name) ? param.name : "form" ;
-    //var parent = (param.parent) ? $("#"+param.parent) : $("body") ;
     var submitText = (param.submitText) ? param.submitText : "submit" ;
     
     form = $("<form>").attr("name", name) ;
@@ -214,15 +237,6 @@ DUBBE.form.create = function(param){
         return form ;
     }
 
-}
-
-DUBBE.namespace("DUBBE.ajax") ;
-
-DUBBE.ajax.get = function(param) {
-    
-}
-DUBBE.ajax.set = function(param) {
-    
 }
 
 DUBBE.namespace("DUBBE.ui") ;
