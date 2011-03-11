@@ -170,10 +170,9 @@ app.post('/api/:model?', function(req, res) {
             
             res.writeHead(200, {
                 'Content-type': 'application/json',
-                'Content-length': JSON.stringify(task).length
             })
             
-            res.end(JSON.stringify(task));
+            res.end(error);
             
             }
     
