@@ -1,29 +1,28 @@
 .popUp {
-     position: absolute ;
-     padding: 10px ;
-     text-align: center ;
-     border: 1px solid #aaa ;
+    position: absolute ;
+    padding: 10px ;
+    text-align: center ;
+    border: 1px solid #aaa ;
+    
+    /*color is up to you, overlay png gives button a gradient*/
+    
+    /*style the cursor and text of the button*/
+    color: #333;
+    text-decoration: none;
+    line-height: 1;
+    
+    /*add rounded corners in mozilla and webkit*/
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    
+    /*Add box shadows and a bottom border with rgba colors*/
+    background: rgba(255,255,255, .75);
+    background: -moz-linear-gradient(top, rgba(255,255,255, .75), rgba(250,250,250, .75));
+    background: -webkit-gradient( linear, left top, left bottom, from( rgba(1255,255,255, .75) ), to( rgba(250,250,250, .75) ) );
+    background: linear-gradient(top, rgba(255,255,255, .75), rgba(250,250,250, .75));
+    filter: progid:DXImageTransform.Microsoft.Gradient( startColorStr='#ffffff', endColorStr='#dddddd', GradientType=0 );
      
-     /*color is up to you, overlay png gives button a gradient*/
-     background: #eee url(alert-overlay.png) repeat-x;
-
-     /*style the cursor and text of the button*/
-     color: #333;
-     text-decoration: none;
-     line-height: 1;
-
-     /*add rounded corners in mozilla and webkit*/
-     -moz-border-radius: 5px;
-     -webkit-border-radius: 5px;
-
-     /*Add box shadows and a bottom border with rgba colors*/
-     -moz-box-shadow: 0 0 5px rgba(0,0,0,0.5);
-     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.5);
      
-     
-}
-.popUp h2 {
-     text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
 }
 .popUp p {
     display: block ;
@@ -75,6 +74,18 @@
      -moz-box-shadow: 0 1px 1px rgba(0,0,0,0);
      -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0);
 }
+.buttonLink {
+    text-decoration: none ;
+    border: 0px ;
+}
+.buttonContainer {
+}
+.buttonContainerLeft {
+    float:left ;
+}
+.buttonConatinerRight {
+    float:right ;
+}
 label {
     color: #000 ;
     font-size: 10px ;
@@ -83,7 +94,7 @@ label {
     display:block ;
     text-align: left ;
 }
-input, textarea {
+input, textarea, select {
     /*color is up to you, overlay png gives button a gradient*/
      background: #fff url(alert-overlay.png) repeat-x;
 

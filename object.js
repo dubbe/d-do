@@ -66,7 +66,7 @@ ObjectModel.prototype.create = function(obj, callback) {
  * @param {Object} obj
  * @param {Object} callback
  */
-ObjectModel.prototype.renderAll = function(obj, callback) {
+ObjectModel.prototype.renderAll = function(obj, userId, callback) {
 
     this.db.view(obj.model + '/all',function(error, result) {
         if( error ){
@@ -75,8 +75,21 @@ ObjectModel.prototype.renderAll = function(obj, callback) {
             var docs = [];
 
             result.forEach(function(row){
-                if(obj.parent == row.parent || obj.parent === undefined) {                   
-                    docs.push(row);
+                if (obj.model == "project") {
+                    /* 
+                     * If it's a project we have to see so we only get access to the projects we are members of
+                     */
+                    for(var i = 0; i < row.teamMember.length; i++) {
+                        if(row.teamMember[i] == userId) {
+                            docs.push(row)
+                        } else { 
+                        }
+                    }
+                }
+                else {
+                    if (obj.parent == row.parent || obj.parent === undefined) {
+                        docs.push(row);
+                    }
                 }
                 
             });
@@ -113,6 +126,38 @@ ObjectModel.prototype.update = function(id, obj, callback){
             callback(null, result);
         }
     });
+}
+
+ObjectModel.prototype.addTeamMember = function(id, obj, callback){
+
+    var userArray = [obj.userId] ;
+    var that = this ;
+    this.db.get(id, function(error, result) {
+        if (!error) {
+            
+            for(var i=0; i < result.teamMember.length; i++) {
+                if(result.teamMember[i] == obj.userId) {
+                    return ;
+                } else {
+                    userArray.push(result.teamMember[i])
+                }
+            }
+
+            newObj.teamMember = userArray ;
+
+            that.db.merge(id, newObj, function(error, result){
+                 if (error) {
+                    callback(error)
+                 }
+                 else {
+                    callback(null, result);
+                 }
+             });
+        }
+    }) ; 
+ 
+    
+    
 }
 
 

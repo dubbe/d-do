@@ -97,14 +97,13 @@ app.get('/api/:model/:id?.:format?', function(req, res) {
     if(!req.params.format || req.params.format == "json") {
          if (req.params.id) {
              objectModel.render(req.params.id, function(error, task){
-                 var body = JSON.stringify(task);
-                 if (body) {
+                 var task = JSON.stringify(task);
+                 if (task) {
                      res.writeHead(200, {
                          'Content-type': 'application/json',
-                         'Content-length': body.length
                      
                      })
-                     res.end(body);
+                     res.end(task);
                  }
                  else {
                      res.writeHead(404, {
@@ -116,15 +115,15 @@ app.get('/api/:model/:id?.:format?', function(req, res) {
              })
          } else {
          
-             objectModel.renderAll(req.params, function(error, task){
-                 var body = JSON.stringify(task);
-                 if (body) {
+             objectModel.renderAll(req.params, req.session.userid, function(error, task){
+                 var task = JSON.stringify(task);
+                 if (task) {
+                     req.setEncoding("utf-8") ;
                      res.writeHead(200, {
-                         'Content-type': 'application/json',
-                         'Content-length': body.length
+                         'Content-type': 'application/json'
                      
                      })
-                     res.end(body);
+                     res.end(task);
                  }
                  else {
                      res.writeHead(404, {
@@ -193,27 +192,49 @@ app.post('/api/:model?', function(req, res) {
 
 // Update
 app.put('/api/:model/:id.:format?', function(req, res) {
-    console.log("update") ;
     
-    objectModel.update(req.params.id, req.body, function(error, obj){
-    
-        if (obj) {
-            res.writeHead(200, {
-                'Content-type': 'application/json',
-                'Content-length': JSON.stringify(obj).length
-            })
-            
-            res.end(JSON.stringify(obj));
-        } else {
-            res.writeHead(404, {
-                'Content-type': 'application/text'
-            
-            })
-            res.end("No information!");
-        }
+    if(req.params.model == "addTeamMember") {
+        objectModel.addTeamMember(req.params.id, req.body, function(error, obj){
         
+            if (obj) {
+                res.writeHead(200, {
+                    'Content-type': 'application/json',
+                    'Content-length': JSON.stringify(obj).length
+                })
+                
+                res.end(JSON.stringify(obj));
+            } else {
+                res.writeHead(404, {
+                    'Content-type': 'application/text'
+                
+                })
+                res.end("No information!");
+            }
+            
+            
+        });
+    } else {
+
+        objectModel.update(req.params.id, req.body, function(error, obj){
         
-    });
+            if (obj) {
+                res.writeHead(200, {
+                    'Content-type': 'application/json',
+                    'Content-length': JSON.stringify(obj).length
+                })
+                
+                res.end(JSON.stringify(obj));
+            } else {
+                res.writeHead(404, {
+                    'Content-type': 'application/text'
+                
+                })
+                res.end("No information!");
+            }
+            
+            
+        });
+    }
     
 }); 
 /*

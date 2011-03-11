@@ -19,7 +19,27 @@ DUBBE.ddo.user = {
             }  
         });
 
-    return resp ;
+        return resp ;
+    },
+    
+    getAll: function() {
+        var that = this ;
+        var resp ;
+        
+        $.ajax({
+            type: "GET",
+            url: "/api/user",
+            async: false,
+            success: function(user) {
+               resp = user ;         
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                console.log(xhr.status);
+                console.log(thrownError);
+            }  
+        });
+
+        return resp ;
     }
 }
 
@@ -36,7 +56,7 @@ DUBBE.ddo.task = {
         
         parent = (task.userId) ? $("#"+task.userId) : parent ;
         
-        $("<li>").addClass("task").attr("id", task._id).appendTo(parent).html("<p><b>"+task.title+"</b><br />"+task.info+"</p>") ;
+        $("<li>").attr("id", task._id).appendTo(parent).html("<h3>"+task.title+"</h3><p>"+task.info+"</p>") ;
     
     },
     renderAll: function(param) {
@@ -73,7 +93,6 @@ DUBBE.ddo.task = {
             url: "/api/task/"+param.taskId,
             data: data,
             success: function(msg) {
-                console.log("yeah!") ;
             }
         })
     }
@@ -102,6 +121,8 @@ DUBBE.ddo.projectBar = {
                 console.log(thrownError);
             }  
         }); 
+        
+        DUBBE.ddo.menuBar.render() ;
     },
     /**
      * Renders a div with the project in and adds it to the projectbar
@@ -140,6 +161,9 @@ DUBBE.ddo.project = {
     
     render: function(project) {
         
+        var users, unassigned, done, i, userList,
+            that = this ;
+        
         $("#users").empty() ;
         $("#tasks").empty() ;
         
@@ -159,44 +183,85 @@ DUBBE.ddo.project = {
          * Renders containers for done and unassigned tasks
          */
         
-        var unassigned = $("<ul>").attr("id", "unassigned").appendTo("#tasks").addClass("sortable") ;
-        var done = $("<ul>").attr("id", "done").appendTo("#tasks").addClass("sortable") ;
+        unassigned = $("<ul>").attr("id", "unassigned").appendTo("#tasks").addClass("sortable") ;
+        done = $("<ul>").attr("id", "done").appendTo("#tasks").addClass("sortable") ;
         
-        var tasks = $("#tasks").append(
-            $("<a>").click(function(e) {
-                e.preventDefault() ;
         
-                    // Creats the form in the popup
-                    DUBBE.utils.popup({
-                        header: "Ny task",
-                        obj: 
-                            DUBBE.form.create({
-                                name: "form",
-                                fields: [{
-                                    name: "title",
-                                    type: "input",
-                                    label: "Namn"   
-                                }, {
-                                    name: "info",
-                                    type: "text",
-                                    label: "Information"
-                                }, {
-                                    name: "prio",
-                                    type: "input",
-                                    label: "Prioritet"
-                                }],
-                                submit: function(p) {
-                                    DUBBE.ddo.ajax.create({
-                                        data: p,
-                                        model: "task",
-                                        parent: project._id,
-                                        parentElem: unassigned
-                                    }) ;
-                                },    
-                                submitText: "Spara"
-                            }) 
-                    }) 
-            }).text("Skapa task").attr("href", "#")) ;
+        // re-render the menuBar so we don't have a lot of unused buttons
+        DUBBE.ddo.menuBar.render() ;
+        
+        // Add create a task to the menuBar
+        DUBBE.utils.createButton({
+            text: "Skapa task",
+            parent: $("#menu"),
+            fn: function() {
+                DUBBE.utils.popup({
+                    header: "Ny task",
+                    obj: 
+                        DUBBE.form.create({
+                            name: "form",
+                            fields: [{
+                                name: "title",
+                                type: "input",
+                                label: "Namn"   
+                            }, {
+                                name: "info",
+                                type: "text",
+                                label: "Information"
+                            }, {
+                                name: "prio",
+                                type: "input",
+                                label: "Prioritet"
+                            }],
+                            submit: function(p) {
+                                DUBBE.ddo.ajax.create({
+                                    data: p,
+                                    model: "task",
+                                    parent: project._id,
+                                    parentElem: unassigned
+                                }) ;
+                            },    
+                            submitText: "Spara"
+                        }) 
+                })
+            } 
+        }) ;
+        
+        // Add user-management to menuBar
+        
+        users = DUBBE.ddo.user.getAll() ;
+        userList = {} ;
+        
+        $(users).each(function(i) {
+            userList[users[i]._id] = users[i].name  ;
+        });
+        
+        DUBBE.utils.createButton({
+            text: "Lägg till användare",
+            parent: $("#menu"),
+            fn: function() {
+                DUBBE.utils.popup({
+                    header: "Lägg till användare",
+                    obj: 
+                        DUBBE.form.create({
+                            name: "form",
+                            fields: [{
+                                name: "user",
+                                type: "select",
+                                label: "Användare",
+                                options: userList
+                            }],
+                            submit: function(p) {
+                                that.addUser({
+                                    userId: p.user.val(),
+                                    projectId: project._id
+                                }) ;
+                            },    
+                            submitText: "Spara"
+                        }) 
+                })
+            } 
+        }) ;
         
         DUBBE.ddo.task.renderAll({
             parentElem: unassigned,
@@ -206,7 +271,6 @@ DUBBE.ddo.project = {
         $(".sortable").sortable({
             connectWith: ".sortable",
             receive: function(event, ui) {
-                console.log(ui.item) ;
                 DUBBE.ddo.task.assign({
                     taskId: $(ui.item).attr("id"),
                     userId: $(this).attr("id")
@@ -214,8 +278,63 @@ DUBBE.ddo.project = {
             }
         }).disableSelection();        
         
+    },
+    addUser: function(param) {
+        
+        data = "userId="+param.userId ;
+        
+        console.log(data) ;
+        
+        $.ajax({
+            type: "PUT",
+            url: "/api/addTeamMember/"+param.projectId,
+            data: data,
+            success: function(msg) {
+            }
+        }) 
     }
 } 
+
+DUBBE.ddo.menuBar = {
+    render: function() {
+        
+        $("#menu").empty() ;
+        
+        DUBBE.utils.createButton({
+            text: "Skapa project",
+            parent: $("#menu"),
+            fn: function(){
+                DUBBE.utils.popup({
+                    header: "Nytt projekt",
+                    obj: DUBBE.form.create({
+                        name: "form",
+                        fields: [{
+                            name: "title",
+                            type: "input",
+                            label: "Namn"
+                        }, {
+                            name: "info",
+                            type: "text",
+                            label: "Information"
+                        }],
+                        submit: function(p){
+                        
+                            DUBBE.ddo.ajax.create({
+                                data: p,
+                                model: "project"
+                            });
+                        },
+                        submitText: "Spara"
+                    })
+                });
+            }
+        }) ;
+    
+    
+    
+    }
+    
+}
 
 
 /**
@@ -229,6 +348,7 @@ DUBBE.ddo.ajax = {
      */
     render: function(msg, parent) {
         if (msg.type == "project") {
+            console.log("render button" + msg) ;
             DUBBE.ddo.projectBar.renderButton(msg)
         }
         else 
@@ -285,37 +405,9 @@ $(document).ready(function() {
      * Adds the onclick function to the createProject link
      */
     
-    $("#createProject").click(function(e) {
-        e.preventDefault() ;
-        
-        DUBBE.utils.popup({
-            header: "Nyt projekt",
-            obj: 
-                DUBBE.form.create({
-                    name: "form",
-                    fields: [{
-                        name: "title",
-                        type: "input",
-                        label: "Namn"   
-                    }, {
-                        name: "info",
-                        type: "text",
-                        label: "Information"
-                    }],
-                    submit: function(p) {
-                        
-                        DUBBE.ddo.ajax.create({
-                            data: p,
-                            model: "project"
-                        }) ;
-                    },
-                    submitText: "Spara"
-                }) 
-            
-        }) ;
-        
-        
-    }) ;
+
+    
+
     
 
 });

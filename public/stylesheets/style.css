@@ -107,9 +107,8 @@ body {
 
 
 
-.task {
-    width: 100px ;
-    padding: 15px ;
+#users ul li, #tasks ul li {
+
     margin: 5px ;
     position:relative;
     display: inline-block;
@@ -125,6 +124,24 @@ body {
     -moz-box-shadow: 5px 5px 10px rgba(0, 0, 0, .25);
     box-shadow: 5px 5px 10px rgba(0, 0, 0, .25);
 }
+#users ul li {
+    width: 100px ;
+    padding: 15px ;
+}
+#tasks ul li {
+    width: 280px ;
+    padding: 0px 5px ;
+}
+#tasks ul#done li p {
+    display: none ;
+}
+#tasks ul#done li h3 {
+    font-size: 14px ;
+    font-weight: bold ;
+    margin: 0px ;
+    padding: 2px ;
+}
+
 .clr  {
     clear: both ;
 }

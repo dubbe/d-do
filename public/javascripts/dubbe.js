@@ -24,13 +24,25 @@ DUBBE.namespace = function(nsString){
     return parent;
 } ;
 /**
- * Namespace
+ * @namespace 
+ * 
+ * DUBBE.utils is a collection of functions; 
+ * create a popup, a button, center, and fill screen 
+ * 
  */
 DUBBE.namespace("DUBBE.utils") ;
 
 /**
- * Generic pop-up function.
- * @param {Object} param
+ * A generic popup function
+ * @param {string} [param.header] The headline for the pop-up
+ * @param {string} [param.text] The info-text
+ * @param {object} [param.obj] An object to show in the pop-up
+ * @param {array} [param.events] Functions to be executed when button is pushed
+ * @param {function} [param.events.fn] The function to be executed
+ * @param {string} param.events.text The text of the button
+ * 
+ * @return {object} Returns the pop-up object (not the background)
+ * 
  */
 DUBBE.utils.popup = function(param){
 
@@ -44,6 +56,7 @@ DUBBE.utils.popup = function(param){
         }
     }) ;
     
+    // we have to make sure that the bg fills the creen
     DUBBE.utils.fillScreen(bg) ;
     
     var popup = $("<div>").addClass("popUp").appendTo(bg) ;
@@ -100,22 +113,59 @@ DUBBE.utils.popup = function(param){
 /**
  * Generic create button-function
  * @param {Object} param
+ * @param {String} param.text The text on the button
+ * @param {function} param.fn The function to be executed on keypress
+ * @param {Object} [param.replace] Object to replace with button
+ * @param {Object} [param.parent] Object to append button to
+ * @param {String} [param.align] Alignment of the button (Left, Right or Center)
+ * 
+ * @returns returns the created link with a div inside
  * 
  * Todo: add image? 
  */
 DUBBE.utils.createButton = function(param){
 
-    return $("<a>").attr("href", "#").click(function(e) {
+    var class = "buttonContainerLeft" ;
+       
+    if (param.align) {
+        switch (param.align) {
+            case "center":
+                class = "buttonContainer";
+                break;
+            case "right":
+                class = "buttonContainerRight";
+                break;
+            default:
+                class = "buttonContainerLeft";
+                break;
+        }
+    }
+
+
+    var btn = $("<div>").addClass(class).append(
+        $("<a>").attr("href", "#").addClass("buttonLink").click(function(e) {
             e.preventDefault() ;
             param.fn();
         }).append( 
-            $("<div>").attr("class", "button").text(param.text)    
-        );
+            $("<div>").addClass("button").text(param.text)    
+        )
+    );
+    
+    if(param.parent) {
+        btn.appendTo(param.parent) ;
+    }
+    else if (param.replace) {
+        param.replace.replaceWith(btn) ;
+    } else {
+        return btn ;
+    }
+        
+        
 
 }
 /**
  * Centers the object relative to the window
- * @param {Object} obj
+ * @param {Object} obj The object to center
  * 
  * Todo: center relative to parent?
  */
@@ -151,14 +201,26 @@ DUBBE.utils.fillScreen = function fillScreen(obj) {
     }
 } ;
 
+/**
+ * @namespace
+ * 
+ * I will gather functions to handle forms under DUBBE.form
+ * 
+ */
 DUBBE.namespace("DUBBE.form") ;
 
 /**
  * Creates a form and submits it, relies on DUBBE.utils.createButton
- * @param {Object} param
+ * @param {Object} param The object with the settings in
+ * @param {String} [param.name] The name of the form, defaults to "form"
+ * @param {String} [param.submitText] The text on the submit-button, defaults to "submit"
+ * @param {Object} [param.fields] The fields of the form
+ * @param {String} param.fields.name The name of the field
+ * @param {String} [param.fields.type] The type of formfield, defaults to "input"
+ * @param {String} [param.fields.value] The pre-set value of the field, defaults to ""
+ * @param {String} [param.fields.label] The label or the formfield, defaults to param.fields.name
  * 
  * TODO: validation
- * TODO: select
  */
 
 DUBBE.form.create = function(param){
@@ -198,7 +260,13 @@ DUBBE.form.create = function(param){
                         value: value
                     }).appendTo(form);
                     break;
-                    
+                case "select":
+                    input = $("<select>").appendTo(form);
+                    for (var index in param.fields[i].options) {
+                        console.log("testar") ;
+                        input.append($("<option>").attr({'text': param.fields[i].options[index], 'value': index}))
+                    } ;
+                    break;    
                 default:
                     input = $("<input>").attr({
                         type: type,
@@ -212,10 +280,14 @@ DUBBE.form.create = function(param){
         }
     }
     
+    // Need to add a clear so the button is correctly aligned
+    $("<div>").addClass("clr").appendTo(form) ;
+    
     if (param.submit) {
         
         DUBBE.utils.createButton({
             text: submitText,
+            align: "center",
             fn: function(){
                 
                 param.submit(inputs) ;
