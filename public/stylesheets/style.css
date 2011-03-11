@@ -129,13 +129,17 @@ body {
     padding: 15px ;
 }
 #tasks ul li {
-    width: 280px ;
-    padding: 0px 5px ;
+    width: 270px ;
+    padding: 10px ;
+}
+#users ul li a, #tasks ul li a {
+    font-size: 16px ;
+    font-weight: bold ;
 }
 #tasks ul#done li p {
     display: none ;
 }
-#tasks ul#done li h3 {
+#tasks ul#done li a {
     font-size: 14px ;
     font-weight: bold ;
     margin: 0px ;

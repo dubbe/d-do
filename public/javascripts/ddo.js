@@ -82,8 +82,59 @@ DUBBE.ddo.task = {
     render: function(task, parent) {
         
         parent = (task.userId) ? $("#"+task.userId) : parent ;
+
         
-        return $("<li>").attr("id", task._id).appendTo(parent).html("<h3>"+task.title+"</h3><p>"+task.info+"</p>") ;
+        var taskLi = $("<li>").attr("id", task._id).append(
+            $("<a>").text(task.title).attr("href", "#").click(function() {
+
+                DUBBE.utils.popup({
+                    header: "Editera task",
+                    obj: 
+                        DUBBE.form.create({
+                            name: "form",
+                            fields: [{
+                                name: "title",
+                                type: "input",
+                                label: "Namn",
+                                value: task.title   
+                            }, {
+                                name: "info",
+                                type: "text",
+                                label: "Information",
+                                value: task.info 
+                            }, {
+                                name: "prio",
+                                type: "select",
+                                label: "Prioritet",
+                                options: {
+                                    "1": "1",
+                                    "2": "2",
+                                    "3": "3",
+                                    "4": "4",
+                                    "5": "5"
+                                },
+                                selected: task.prio
+                            }],
+                            submit: function(p) {
+                                DUBBE.ddo.ajax.update({
+                                    data: p,
+                                    id: task._id
+                                }) ;
+                            },    
+                            submitText: "Spara"
+                        }) 
+                })
+
+            })
+        ).append(
+                $("<p>").text(task.info)
+            ) ;
+        
+        if ($("#"+task._id).length == 0) {
+            taskLi.appendTo(parent) ;
+        } else {
+            $("#"+task._id).replaceWith(taskLi) ;
+        }
     
     },
     
@@ -98,7 +149,6 @@ DUBBE.ddo.task = {
     renderAll: function(param) {
 
         var that = this ;
-        console.log(param) ;
         
         $.ajax({
             type: "GET",
@@ -264,8 +314,15 @@ DUBBE.ddo.project = {
                                 label: "Information"
                             }, {
                                 name: "prio",
-                                type: "input",
-                                label: "Prioritet"
+                                type: "select",
+                                label: "Prioritet",
+                                options: {
+                                    "1": "1",
+                                    "2": "2",
+                                    "3": "3",
+                                    "4": "4",
+                                    "5": "5"
+                                }
                             }],
                             submit: function(p) {
                                 DUBBE.ddo.ajax.create({
@@ -427,7 +484,6 @@ DUBBE.ddo.ajax = {
      */
     render: function(msg, parent) {
         if (msg.type == "project") {
-            console.log("render button" + msg) ;
             DUBBE.ddo.projectBar.renderButton(msg)
         }
         else 
@@ -468,6 +524,34 @@ DUBBE.ddo.ajax = {
                 else {
                     that.render(msg);
                 }
+            }
+        })
+    },
+    update: function(param) {
+        
+        var object = param.data ;
+        var model = (param.model) ? param.model : "" ;
+        
+        var data = "" ;
+        
+        
+        
+        $.each(object, function(i, val) {
+            data += i + "=" + $(val).val() + "&" ; 
+        }) ;
+        
+        // Remove the last &
+        data = data.substring(0, data.length-1) ;
+        
+        $.ajax({
+            type: "PUT",
+            url: "/api/task/"+param.id,
+            data: data,
+            success: function(msg) {
+                DUBBE.ddo.task.render(msg) ;
+            },
+            error: function(msg) {
+                console.log(msg)
             }
         })
     }

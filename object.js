@@ -105,6 +105,7 @@ ObjectModel.prototype.renderAll = function(obj, userId, callback) {
  * @param {Object} callback
  */
 ObjectModel.prototype.render = function(id, callback) {
+    
 
     this.db.get(id, function(error, result) {
         if( error ){
@@ -112,18 +113,24 @@ ObjectModel.prototype.render = function(id, callback) {
         }else{
 
             callback(null, result);
+            
         } 
     });
 }
 
 ObjectModel.prototype.update = function(id, obj, callback){
-
+    var that = this ;
+    
     this.db.merge(id, obj, function(error, result){
         if (error) {
             callback(error)
         }
         else {
-            callback(null, result);
+            that.db.get(result.id, function(error, result) {
+                if (!error) {
+                    callback(null, result);
+                }
+            });
         }
     });
 }

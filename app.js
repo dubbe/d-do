@@ -217,13 +217,13 @@ app.put('/api/:model/:id.:format?', function(req, res) {
 
         objectModel.update(req.params.id, req.body, function(error, obj){
         
+            
             if (obj) {
                 res.writeHead(200, {
-                    'Content-type': 'application/json',
-                    'Content-length': JSON.stringify(obj).length
-                })
-                
+                    'Content-type': 'application/json'
+                }) ;
                 res.end(JSON.stringify(obj));
+                
             } else {
                 res.writeHead(404, {
                     'Content-type': 'application/text'

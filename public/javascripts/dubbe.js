@@ -226,6 +226,8 @@ DUBBE.namespace("DUBBE.form") ;
  * @param {String} [param.fields.type] The type of formfield, defaults to "input"
  * @param {String} [param.fields.value] The pre-set value of the field, defaults to ""
  * @param {String} [param.fields.label] The label or the formfield, defaults to param.fields.name
+ * @param {String} [param.fields.options]
+ * @param {String} [param.fields.selected]
  * 
  * TODO: validation
  */
@@ -270,8 +272,12 @@ DUBBE.form.create = function(param){
                 case "select":
                     input = $("<select>").appendTo(form);
                     for (var index in param.fields[i].options) {
-                        console.log("testar") ;
-                        input.append($("<option>").attr({'text': param.fields[i].options[index], 'value': index}))
+                        var option = $("<option>").attr({'text': param.fields[i].options[index], 'value': index}).appendTo(input) ;
+                        
+                        if(param.fields[i].selected == param.fields[i].options[index]) {
+                            option.attr("selected", "selected") ;
+                        }
+                        
                     } ;
                     break;    
                 default:
