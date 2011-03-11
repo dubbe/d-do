@@ -34,7 +34,7 @@ DUBBE.ddo.task = {
     
     render: function(task, parent) {
         
-        parent = (task.userId) ? $("#"+task.userId) : parent ;
+        parent = (task.userId) ? $("#"+task.userId) : $("#taskContainer") ;
         
         $("<li>").addClass("task").attr("id", task._id).appendTo(parent).html("<p><b>"+task.title+"</b><br />"+task.info+"</p>") ;
     
@@ -136,7 +136,7 @@ DUBBE.ddo.project = {
         
         
         for (i in project.teamMember) {
-
+            
             $("#users").append(
                 $("<h2>").text(DUBBE.ddo.user.get(project.teamMember[i]).name)
             ).append(
@@ -144,7 +144,7 @@ DUBBE.ddo.project = {
             )
         }
         
-        var div = $("<ul>").appendTo("#tasks").addClass("sortable") ;
+        var div = $("<ul>").attr("id", "taskContainer").appendTo("#tasks").addClass("sortable") ;
         
         var tasks = $("#tasks").append(
             $("<a>").click(function(e) {
@@ -247,7 +247,6 @@ DUBBE.ddo.ajax = {
             data: data,
             success: function(msg) {
                 if (param.parentElem) {
-                    
                     that.render(msg, param.parentElem) ;
                 }
                 else {

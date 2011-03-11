@@ -26,9 +26,6 @@ ObjectModel.prototype.create = function(obj, callback) {
    
     var allFunction,
         that = this
-
-
-    console.log(obj.type) ;
     
     if (obj.type == "project") {
         allFunction = function(doc){
@@ -57,6 +54,7 @@ ObjectModel.prototype.create = function(obj, callback) {
       }
       else {
           that.db.get(result.id, function (err, doc) {
+            doc._id = result.id ;
             callback(null, doc)
         });
       }
@@ -106,7 +104,7 @@ ObjectModel.prototype.render = function(id, callback) {
 }
 
 ObjectModel.prototype.update = function(id, obj, callback){
-    console.log(id) ;
+
     this.db.merge(id, obj, function(error, result){
         if (error) {
             callback(error)

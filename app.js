@@ -88,8 +88,6 @@ app.get("/", function(req, res, params){
  */
 
 app.get('/api/:model/:id?.:format?', function(req, res) {
-
-   console.log(req.query) ;
    
    if(req.query.parent) {
        req.params.parent = req.query.parent ;
@@ -199,8 +197,6 @@ app.put('/api/:model/:id.:format?', function(req, res) {
     console.log("update") ;
     
     objectModel.update(req.params.id, req.body, function(error, obj){
-
-        console.log(obj) ;
     
         if (obj) {
             res.writeHead(200, {
@@ -249,6 +245,7 @@ app.get('/auth/facebook', function(req,res) {
                 }
                 
             });
+            console.log(req.getAuthDetails().user['name'] + " logged in") ;
         }
         
     }) ;
