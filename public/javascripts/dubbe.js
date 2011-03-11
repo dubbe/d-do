@@ -119,7 +119,7 @@ DUBBE.utils.popup = function(param){
  * @param {Object} [param.parent] Object to append button to
  * @param {String} [param.align] Alignment of the button (Left, Right or Center)
  * 
- * @returns returns the created link with a div inside
+ * @returns returns a div with the button
  * 
  * Todo: add image? 
  */
@@ -167,6 +167,8 @@ DUBBE.utils.createButton = function(param){
  * Centers the object relative to the window
  * @param {Object} obj The object to center
  * 
+ * @returns the object
+ * 
  * Todo: center relative to parent?
  */
 DUBBE.utils.center = function center(obj) {
@@ -181,11 +183,14 @@ DUBBE.utils.center = function center(obj) {
         fillScreen(obj) ;
     }
     
+    return obj ;
      
 } ;
 /**
  * Object fills the body and not only the screen, resize on onresize
- * @param {Object} obj
+ * @param {Object} obj The object that is going to fill the screen
+ * 
+ * @returns the object
  */
 DUBBE.utils.fillScreen = function fillScreen(obj) {
 
@@ -199,6 +204,8 @@ DUBBE.utils.fillScreen = function fillScreen(obj) {
     document.body.onresize = function() {
         fillScreen(obj) ;
     }
+    
+    return obj;
 } ;
 
 /**

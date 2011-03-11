@@ -1,6 +1,22 @@
+/**
+ * DUBBE.do will hold all functions specific to the ddo-application. Anything more general will be found in dubbe.js
+ * 
+ * @namespace
+ */
 DUBBE.namespace("DUBBE.ddo") ;
 
+/**
+ * DUBBE.ddo.user will hold things to do with the user
+ */
+
 DUBBE.ddo.user = {
+    /**
+     * A getter so you can get the user from the couchDb with help of the userId
+     * 
+     * @param {Object} userId the userId
+     * 
+     * @returns a user-object
+     */
     get: function(userId) {
         
         var that = this ;
@@ -21,7 +37,11 @@ DUBBE.ddo.user = {
 
         return resp ;
     },
-    
+    /**
+     * Gets all users from db
+     * 
+     * @returns all users
+     */
     getAll: function() {
         var that = this ;
         var resp ;
@@ -45,20 +65,36 @@ DUBBE.ddo.user = {
 
 /**
  * Functions for tasks specifically
- * @param {Object} task
- * @param {Object} parent
  */
 
 DUBBE.ddo.task = {
  
+    /**
+     * 
+     * A function to render a task
+     * 
+     * @param {Object} task A object with the task
+     * @param {Object} [parent] The parent is the div whom the task should append to (it will first try to append to task.userId
+     * 
+     * @returns The li with the task information
+     */
     
     render: function(task, parent) {
         
         parent = (task.userId) ? $("#"+task.userId) : parent ;
         
-        $("<li>").attr("id", task._id).appendTo(parent).html("<h3>"+task.title+"</h3><p>"+task.info+"</p>") ;
+        return $("<li>").attr("id", task._id).appendTo(parent).html("<h3>"+task.title+"</h3><p>"+task.info+"</p>") ;
     
     },
+    
+    /**
+     * Receivs all task for a project from the db, loops through them and render them with the help of DUBBE.ddo.task.render
+     * 
+     * @param {Object} param Object with the settings
+     * @param {Object} param.parentElement The element in which the task should be appended to
+     * @param {String} param.parent The id for the parent-project.
+     * 
+     */
     renderAll: function(param) {
 
         var that = this ;
@@ -84,6 +120,14 @@ DUBBE.ddo.task = {
     update: function() {
         
     },
+    
+    /**
+     * When a task is droped on a ul (either one of the user, unassigned or done) this function updates the db with correct ownership
+     * @param {Object} param the object that includes parameters
+     * @param {string} param.userId the user id
+     * @param {string} param.taskId the id of the task
+     * 
+     */
     assign: function(param) {
         
         var data = "userId="+param.userId ;
@@ -100,9 +144,13 @@ DUBBE.ddo.task = {
     
 }
 
+/**
+ *  The projectbar is the div on top where you can chose among the projects
+ */
+
 DUBBE.ddo.projectBar = {
     /**
-     * Loops through all projects and renders them using render
+     * Loops through all projects and renders them using DUBBE.ddo.projectBar.renderButton
      */
     render: function(){
         
@@ -122,14 +170,17 @@ DUBBE.ddo.projectBar = {
             }  
         }); 
         
-        DUBBE.ddo.menuBar.render() ;
+        
+        
+        
     },
     /**
      * Renders a div with the project in and adds it to the projectbar
-     * @param {Object} project
+     * @param {Object} project The object that contains the project
+     * 
      */
     renderButton: function(project) {
-        var that = this ;
+        
         $("<li>").append(
             $("<a>").addClass("project").text(project.title).appendTo($("#projectBar"))
         ) ;
@@ -149,7 +200,6 @@ DUBBE.ddo.projectBar = {
 
 /**
  * Functions for projects specifically
- * @param {Object} project
  */
 
 DUBBE.ddo.project = {
@@ -163,6 +213,10 @@ DUBBE.ddo.project = {
         
         var users, unassigned, done, i, userList,
             that = this ;
+        
+        /*
+         * We have to empty the two divs that contains tasks
+         */
         
         $("#users").empty() ;
         $("#tasks").empty() ;
@@ -263,10 +317,22 @@ DUBBE.ddo.project = {
             } 
         }) ;
         
+        /* 
+         * And render all tasks, we send parentElem which is the div they should be appended to if they have no other parent.
+         * Parent is the project id of the parent-project
+         */
+        
         DUBBE.ddo.task.renderAll({
             parentElem: unassigned,
             parent: project._id
         })
+        
+        /*
+         * Adding jquerys sortable to the ul's in which we have tasks
+         * 
+         * on recieve we fire the DUBBE.ddo.task.assign
+         * 
+         */
         
         $(".sortable").sortable({
             connectWith: ".sortable",
@@ -279,6 +345,14 @@ DUBBE.ddo.project = {
         }).disableSelection();        
         
     },
+    
+    /**
+     * The ajax-function to add a new teamMember to a project
+     * 
+     * @param {Object} param The object holding the parameters
+     * @param {String} param.userId The id of the user to add
+     * @param {String} param.projectId The id of the project the user should be added to
+     */
     addUser: function(param) {
         
         data = "userId="+param.userId ;
@@ -295,13 +369,21 @@ DUBBE.ddo.project = {
     }
 } 
 
+/**
+ * menuBar is the div in which we add the menu-button such as "add project", "add task" and so forth
+ */
+
 DUBBE.ddo.menuBar = {
+    /**
+     * init the menuBar by adding the create project button
+     */
     render: function() {
         
+        // Start by empty the div
         $("#menu").empty() ;
         
         DUBBE.utils.createButton({
-            text: "Skapa project",
+            text: "Skapa projekt",
             parent: $("#menu"),
             fn: function(){
                 DUBBE.utils.popup({
@@ -328,10 +410,7 @@ DUBBE.ddo.menuBar = {
                     })
                 });
             }
-        }) ;
-    
-    
-    
+        }) ;   
     }
     
 }
@@ -397,17 +476,7 @@ DUBBE.ddo.ajax = {
 
 $(document).ready(function() {
     
-    
-    
     DUBBE.ddo.projectBar.render() ;
+    DUBBE.ddo.menuBar.render() ;
     
-    /**
-     * Adds the onclick function to the createProject link
-     */
-    
-
-    
-
-    
-
 });
