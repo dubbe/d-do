@@ -32,6 +32,8 @@ DUBBE.ddo.task.prototype.render = function(parent) {
         
         var taskLi = $("<li>").attr("id", this.getId()).append(
             $("<a>").text(this.getObject().title).attr("href", "#").click(function() {
+                
+                console.log("testar") ;
 
                 DUBBE.utils.popup({
                     header: "Editera task",
@@ -42,12 +44,12 @@ DUBBE.ddo.task.prototype.render = function(parent) {
                                 name: "title",
                                 type: "input",
                                 label: "Namn",
-                                value: this.getObject().title   
+                                value: that.getObject().title   
                             }, {
                                 name: "info",
                                 type: "text",
                                 label: "Information",
-                                value: this.getObject().info 
+                                value: that.getObject().info 
                             }, {
                                 name: "prio",
                                 type: "select",
@@ -59,13 +61,17 @@ DUBBE.ddo.task.prototype.render = function(parent) {
                                     "4": "4",
                                     "5": "5"
                                 },
-                                selected: this.getObject().prio
+                                selected: that.getObject().prio
                             }],
                             submit: function(p) {
-                                DUBBE.ddo.ajax.update({
+                                
+                                that.setObject(DUBBE.ddo.ajax.update({
                                     data: p,
-                                    id: this.getId()
-                                }) ;
+                                    id: that.getId()
+                                })) ;
+                                
+                                that.render() ;
+                                
                             },    
                             submitText: "Spara"
                         }) 
@@ -84,6 +90,10 @@ DUBBE.ddo.task.prototype.render = function(parent) {
         
         
 }
+/**
+ * Updating the user with new information both in db and on client
+ * @param {Object} userId
+ */
 DUBBE.ddo.task.prototype.assign = function(userId){
 
      var data = "userId=" + userId,

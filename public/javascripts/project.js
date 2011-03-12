@@ -44,7 +44,7 @@ DUBBE.ddo.project.prototype.getTasks = function() {
     
     var that = this ;
     
-    $.ajax({
+   $.ajax({
         type: "GET",
         url: "/api/task/",
         data: "parent="+this.getId(),

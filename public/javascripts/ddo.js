@@ -428,7 +428,7 @@ DUBBE.ddo.ajax = {
         
         var data = "" ;
         
-        
+        var resp ;
         
         $.each(object, function(i, val) {
             data += i + "=" + $(val).val() + "&" ; 
@@ -441,13 +441,16 @@ DUBBE.ddo.ajax = {
             type: "PUT",
             url: "/api/task/"+param.id,
             data: data,
+            async: false,
             success: function(msg) {
-                DUBBE.ddo.task.render(msg) ;
+               resp = msg ;
             },
             error: function(msg) {
                 console.log(msg)
             }
         })
+        
+        return resp ;
     }
 }
 

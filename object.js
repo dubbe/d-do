@@ -137,7 +137,7 @@ ObjectModel.prototype.update = function(id, obj, callback){
 }
 
 ObjectModel.prototype.addTeamMember = function(id, obj, callback){
-
+    var newObj = {};
     var userArray = [obj.userId] ;
     var that = this ;
     this.db.get(id, function(error, result) {
