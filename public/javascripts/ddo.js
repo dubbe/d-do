@@ -9,6 +9,8 @@ DUBBE.namespace("DUBBE.ddo") ;
  * DUBBE.ddo.user will hold things to do with the user
  */
 
+DUBBE.ddo.projectsArray = [] ;
+
 DUBBE.ddo.user = {
     /**
      * A getter so you can get the user from the couchDb with help of the userId
@@ -67,76 +69,7 @@ DUBBE.ddo.user = {
  * Functions for tasks specifically
  */
 
-DUBBE.ddo.task = {
- 
-    /**
-     * 
-     * A function to render a task
-     * 
-     * @param {Object} task A object with the task
-     * @param {Object} [parent] The parent is the div whom the task should append to (it will first try to append to task.userId
-     * 
-     * @returns The li with the task information
-     */
-    
-    render: function(task, parent) {
-        
-        parent = (task.userId) ? $("#"+task.userId) : parent ;
-
-        
-        var taskLi = $("<li>").attr("id", task._id).append(
-            $("<a>").text(task.title).attr("href", "#").click(function() {
-
-                DUBBE.utils.popup({
-                    header: "Editera task",
-                    obj: 
-                        DUBBE.form.create({
-                            name: "form",
-                            fields: [{
-                                name: "title",
-                                type: "input",
-                                label: "Namn",
-                                value: task.title   
-                            }, {
-                                name: "info",
-                                type: "text",
-                                label: "Information",
-                                value: task.info 
-                            }, {
-                                name: "prio",
-                                type: "select",
-                                label: "Prioritet",
-                                options: {
-                                    "1": "1",
-                                    "2": "2",
-                                    "3": "3",
-                                    "4": "4",
-                                    "5": "5"
-                                },
-                                selected: task.prio
-                            }],
-                            submit: function(p) {
-                                DUBBE.ddo.ajax.update({
-                                    data: p,
-                                    id: task._id
-                                }) ;
-                            },    
-                            submitText: "Spara"
-                        }) 
-                })
-
-            })
-        ).append(
-                $("<p>").text(task.info)
-            ) ;
-        
-        if ($("#"+task._id).length == 0) {
-            taskLi.appendTo(parent) ;
-        } else {
-            $("#"+task._id).replaceWith(taskLi) ;
-        }
-    
-    },
+DUBBE.ddo.tasks = {
     
     /**
      * Receivs all task for a project from the db, loops through them and render them with the help of DUBBE.ddo.task.render
@@ -178,40 +111,38 @@ DUBBE.ddo.task = {
      * @param {string} param.taskId the id of the task
      * 
      */
+
     assign: function(param) {
         
-        var data = "userId="+param.userId ;
+        console.log(param.tasks) ;
         
-        $.ajax({
-            type: "PUT",
-            url: "/api/task/"+param.taskId,
-            data: data,
-            success: function(msg) {
+        $(param.tasks).each(function(i) {
+            if(param.tasks[i].getId() == param.taskId) {
+                param.tasks[i].assign(param.userId) ;
             }
         })
+        
+
+
     }
     
     
 }
 
 /**
- *  The projectbar is the div on top where you can chose among the projects
+ * Functions for projects specifically
  */
 
-DUBBE.ddo.projectBar = {
-    /**
-     * Loops through all projects and renders them using DUBBE.ddo.projectBar.renderButton
-     */
-    render: function(){
-        
-        var that = this ;
-
+DUBBE.ddo.projects = {
+    
+    getAll: function() {
         $.ajax({
             type: "GET",
             url: "/api/project",
+            async: false,
             success: function(projects) {
                 for (var i in projects) {
-                    that.renderButton(projects[i]) ;
+                    DUBBE.ddo.projectsArray.push(new DUBBE.ddo.project(projects[i])) ;
                 }
             },
             error:function (xhr, ajaxOptions, thrownError){
@@ -219,41 +150,7 @@ DUBBE.ddo.projectBar = {
                 console.log(thrownError);
             }  
         }); 
-        
-        
-        
-        
     },
-    /**
-     * Renders a div with the project in and adds it to the projectbar
-     * @param {Object} project The object that contains the project
-     * 
-     */
-    renderButton: function(project) {
-        
-        $("<li>").append(
-            $("<a>").addClass("project").text(project.title).appendTo($("#projectBar"))
-        ) ;
-        
-        $("#projectBar").append(
-            $("<li>").append(
-                $("<a>").text(project.title)
-            ).hover(function() {
-                $(this).css('cursor','pointer') ;
-            }).click(function() {
-                DUBBE.ddo.project.render(project)
-            })
-         );
-         
-    }
-}
-
-/**
- * Functions for projects specifically
- */
-
-DUBBE.ddo.project = {
-    
     /**
      * Renders the projects tasks and users
      * @param {Object} project
@@ -274,12 +171,12 @@ DUBBE.ddo.project = {
         /*
          * Renders the user-ul's where each user store there tasks
          */
-        for (i in project.teamMember) {
+        for (i in project.getObject().teamMember) {
             
             $("#users").append(
-                $("<h2>").text(DUBBE.ddo.user.get(project.teamMember[i]).name)
+                $("<h2>").text(DUBBE.ddo.user.get(project.getObject().teamMember[i]).name)
             ).append(
-                $("<ul>").addClass("sortable").attr("id", project.teamMember[i])
+                $("<ul>").addClass("sortable").attr("id", project.getObject().teamMember[i])
             )
         }
         
@@ -328,8 +225,8 @@ DUBBE.ddo.project = {
                                 DUBBE.ddo.ajax.create({
                                     data: p,
                                     model: "task",
-                                    parent: project._id,
-                                    parentElem: unassigned
+                                    parent: project.getId(),
+                                    parentElem: project
                                 }) ;
                             },    
                             submitText: "Spara"
@@ -365,7 +262,7 @@ DUBBE.ddo.project = {
                             submit: function(p) {
                                 that.addUser({
                                     userId: p.user.val(),
-                                    projectId: project._id
+                                    projectId: project.getId()
                                 }) ;
                             },    
                             submitText: "Spara"
@@ -375,31 +272,29 @@ DUBBE.ddo.project = {
         }) ;
         
         /* 
-         * And render all tasks, we send parentElem which is the div they should be appended to if they have no other parent.
-         * Parent is the project id of the parent-project
+         * And render all tasks
          */
         
-        DUBBE.ddo.task.renderAll({
-            parentElem: unassigned,
-            parent: project._id
+        $(project.tasks).each(function(i) {
+            project.tasks[i].render() ;
         })
         
         /*
          * Adding jquerys sortable to the ul's in which we have tasks
          * 
-         * on recieve we fire the DUBBE.ddo.task.assign
-         * 
          */
-        
         $(".sortable").sortable({
             connectWith: ".sortable",
-            receive: function(event, ui) {
-                DUBBE.ddo.task.assign({
+            receive: function(event, ui) {      
+                DUBBE.ddo.tasks.assign({
+                    tasks: project.tasks,
                     taskId: $(ui.item).attr("id"),
                     userId: $(this).attr("id")
-                })
+                }) 
+            
             }
-        }).disableSelection();        
+        }).disableSelection();
+               
         
     },
     
@@ -413,8 +308,6 @@ DUBBE.ddo.project = {
     addUser: function(param) {
         
         data = "userId="+param.userId ;
-        
-        console.log(data) ;
         
         $.ajax({
             type: "PUT",
@@ -484,11 +377,12 @@ DUBBE.ddo.ajax = {
      */
     render: function(msg, parent) {
         if (msg.type == "project") {
-            DUBBE.ddo.projectBar.renderButton(msg)
+            DUBBE.ddo.projectsArray.push(new DUBBE.ddo.project(msg)) ;
         }
         else 
         if (msg.type == "task") {
-            DUBBE.ddo.task.render(msg, parent)
+            console.log(parent) ;
+            parent.addTask(msg) ;
        }
     } ,
     /**
@@ -505,8 +399,8 @@ DUBBE.ddo.ajax = {
             data += i + "=" + $(val).val() + "&" ;  
         }) ;
         
-        if(param.parent){
-            data += "parent=" + param.parent + "&" ;
+        if(param.model == "task"){
+            data += "parent="+param.parentElem.getId()+"&" ;
         }
         
         // Remove the last &
@@ -560,7 +454,8 @@ DUBBE.ddo.ajax = {
 
 $(document).ready(function() {
     
-    DUBBE.ddo.projectBar.render() ;
-    DUBBE.ddo.menuBar.render() ;
-    
+   
+   DUBBE.ddo.projects.getAll() ;
+   DUBBE.ddo.menuBar.render() ;
+
 });

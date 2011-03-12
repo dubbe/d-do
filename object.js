@@ -128,6 +128,7 @@ ObjectModel.prototype.update = function(id, obj, callback){
         else {
             that.db.get(result.id, function(error, result) {
                 if (!error) {
+                    result._id = result.id ;
                     callback(null, result);
                 }
             });
