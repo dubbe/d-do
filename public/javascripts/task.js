@@ -32,8 +32,6 @@ DUBBE.ddo.task.prototype.render = function(parent) {
         
         var taskLi = $("<li>").attr("id", this.getId()).append(
             $("<a>").text(this.getObject().title).attr("href", "#").click(function() {
-                
-                console.log("testar") ;
 
                 DUBBE.utils.popup({
                     header: "Editera task",

@@ -2,7 +2,8 @@ DUBBE.namespace("DUBBE.ddo.project") ;
 
 DUBBE.ddo.project = function(project) {
     
-    this.tasks = []
+    this.tasks = [] ;
+    this.users = [] ;
     
     this.getObject = function() {
         return project ;
@@ -12,7 +13,8 @@ DUBBE.ddo.project = function(project) {
         return project._id ;
     }
     
-    this.getTasks() ;
+    this.initAllTasks() ;
+    this.initAllUsers() ;
     this.renderButton() ;
 }
 
@@ -40,7 +42,7 @@ DUBBE.ddo.project.prototype.addTask = function(task){
     
     
 }
-DUBBE.ddo.project.prototype.getTasks = function() {
+DUBBE.ddo.project.prototype.initAllTasks = function() {
     
     var that = this ;
     
@@ -61,3 +63,21 @@ DUBBE.ddo.project.prototype.getTasks = function() {
     });
 }
 
+DUBBE.ddo.project.prototype.initAllUsers = function(){
+    var that = this ;
+    
+    for (i in this.getObject().teamMember) {
+        $.ajax({
+            type: "GET",
+            url: "/api/user/"+this.getObject().teamMember[i],
+            async: false,
+            success: function(user) {
+                that.users.push(new DUBBE.ddo.user(user)) ;
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                console.log(xhr.status);
+                console.log(thrownError);
+            }  
+        });
+    }
+}

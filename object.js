@@ -136,37 +136,7 @@ ObjectModel.prototype.update = function(id, obj, callback){
     });
 }
 
-ObjectModel.prototype.addTeamMember = function(id, obj, callback){
-    var newObj = {};
-    var userArray = [obj.userId] ;
-    var that = this ;
-    this.db.get(id, function(error, result) {
-        if (!error) {
-            
-            for(var i=0; i < result.teamMember.length; i++) {
-                if(result.teamMember[i] == obj.userId) {
-                    return ;
-                } else {
-                    userArray.push(result.teamMember[i])
-                }
-            }
 
-            newObj.teamMember = userArray ;
-
-            that.db.merge(id, newObj, function(error, result){
-                 if (error) {
-                    callback(error)
-                 }
-                 else {
-                    callback(null, result);
-                 }
-             });
-        }
-    }) ; 
- 
-    
-    
-}
 
 
 exports.ObjectModel = ObjectModel ;

@@ -5,6 +5,10 @@ body {
   padding: 0px ;
   margin: 0px ;
 }
+h2 {
+    color: #4d4d4d;
+    margin: 0 ;
+}
 #container {
     margin-top: 0 ;
     padding: 0 ;
@@ -83,16 +87,56 @@ body {
     width: 600px ;
 }
 #tasks {
-    float: right ;
-    width: 300px ;
+    margin-top: 10px ;
 }
-#users ul, #tasks ul {
+
+#tasksStart, #tasksEnd, #users {
+    margin: 5px ;
+}
+
+#tasksStart {
+    float: left ;
+    width: 250px ;
+}
+#tasksStart ul {
+    width: 215px ;
+}
+
+#tasksEnd {
+    float: left ;
+    width: 200px ;
+}
+#tasksEnd ul {
+    width: 165px ;
+}
+#users {
+    float: left ;
+    width: 500px ;
+}
+#currentUser {
+    float: left ;
+    width: 500px ;
+}
+#currentUser ul {
+    width: 465px ;
+}
+#otherMembers {
+    float: left ;
+}
+#otherMembers div {
+    float: left ;
+    width: 250px ;
+}
+#otherMembers ul {
+    width: 215px ;
+}
+
+#tasksStart ul, #tasksEnd ul, #users ul {
     border: 1px solid #000 ;
     float: left;
-    width: 100% ;
     
     padding: 10px ;
-    margin: 5px ;
+    margin: 5px 5px 20px 5px ;
     list-style-type: none ;
     float: left ;
     
@@ -105,10 +149,11 @@ body {
     box-shadow: 0 0 7px rgba(0, 0, 0, .6);
 }
 
+#tasksStart ul.over, #tasksEnd ul.over, #users ul.over {
+    background: rgba(132,173,209, .75);
+}
 
-
-#users ul li, #tasks ul li {
-
+#tasksStart ul li, #tasksEnd ul li, #users ul li {
     margin: 5px ;
     position:relative;
     display: inline-block;
@@ -124,19 +169,36 @@ body {
     -moz-box-shadow: 5px 5px 10px rgba(0, 0, 0, .25);
     box-shadow: 5px 5px 10px rgba(0, 0, 0, .25);
 }
-#users ul li {
-    width: 100px ;
+
+#tasksStart ul li, #otherMembers ul li {
+    width: 185px ;
+    padding: 5px ;
+}
+#tasksEnd ul li {
+    width: 135px ;
+    padding: 5px ;
+}
+#currentUser ul li {
+    width: 110px ;
     padding: 15px ;
+    
 }
-#tasks ul li {
-    width: 270px ;
-    padding: 10px ;
-}
-#users ul li a, #tasks ul li a {
+#users ul li a, #tasksStart ul li a, #tasksEnd ul li a {
     font-size: 16px ;
     font-weight: bold ;
 }
-#tasks ul#done li p {
+#users ul li.placeHolder, #tasksStart ul li.placeHolder, #tasksEnd ul li.placeHolder {
+    display: inline-block ;
+    background: none ;
+    border: 5px dashed #fff ;
+    min-height: 20px ;
+    
+    -webkit-box-shadow: none ;
+    -moz-box-shadow: none ;
+    box-shadow: none ;
+    
+}
+#tasks ul#done li p, #otherMembers ul li p {
     display: none ;
 }
 #tasks ul#done li a {
@@ -146,6 +208,9 @@ body {
     padding: 2px ;
 }
 
+ul#delete li {
+    display: none ;
+}
 .clr  {
     clear: both ;
 }

@@ -10,6 +10,7 @@ var express = require('express'),
     auth= require('connect-auth'),
     oauth= require('oauth'),
     ObjectModel = require('./object').ObjectModel,
+    ProjectModel = require('./project').ProjectModel,
     User = require('./user').User ;
     
 /**
@@ -38,6 +39,7 @@ app.use(app.router);
 
 //var taskModel = new Task() ;
 var objectModel = new ObjectModel() ;
+var projectModel = new ProjectModel() ;
 var userModel = new User() ;
 
 /**
@@ -95,7 +97,13 @@ app.get('/api/:model/:id?.:format?', function(req, res) {
    
     
     if(!req.params.format || req.params.format == "json") {
-         if (req.params.id) {
+         if (req.params.model == "user" && req.params.id == "current") {
+             res.writeHead(200, {
+                 'Content-type': 'application/json'      
+             })
+             res.end(JSON.stringify(userModel.get(req.session.userid)));
+         }
+         else if (req.params.id) {
              objectModel.render(req.params.id, function(error, task){
                  var task = JSON.stringify(task);
                  if (task) {
@@ -194,7 +202,7 @@ app.post('/api/:model?', function(req, res) {
 app.put('/api/:model/:id.:format?', function(req, res) {
     
     if(req.params.model == "addTeamMember") {
-        objectModel.addTeamMember(req.params.id, req.body, function(error, obj){
+        projectModel.addTeamMember(req.params.id, req.body, function(error, obj){
         
             if (obj) {
                 res.writeHead(200, {

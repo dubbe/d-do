@@ -10,62 +10,51 @@ DUBBE.namespace("DUBBE.ddo") ;
  */
 
 DUBBE.ddo.projectsArray = [] ;
+DUBBE.ddo.usersArray = [] ;
+DUBBE.ddo.currentUser ;
+
 
 /**
  * DUBBE.ddo.user will hold things to do with the user
  */
 
-DUBBE.ddo.user = {
+DUBBE.ddo.users = {
     /**
-     * A getter so you can get the user from the couchDb with help of the userId
-     * 
-     * @param {Object} userId the userId
-     * 
-     * @returns a user-object
-     */
-    get: function(userId) {
-        
-        var that = this ;
-        var resp ;
-        
-        $.ajax({
-            type: "GET",
-            url: "/api/user/"+userId,
-            async: false,
-            success: function(user) {
-               resp = user ;         
-            },
-            error:function (xhr, ajaxOptions, thrownError){
-                console.log(xhr.status);
-                console.log(thrownError);
-            }  
-        });
-
-        return resp ;
-    },
-    /**
-     * Gets all users from db
-     * 
-     * @returns all users
+     * Gets all users from db and adds them to a user-object
      */
     getAll: function() {
-        var that = this ;
-        var resp ;
         
         $.ajax({
             type: "GET",
             url: "/api/user",
             async: false,
             success: function(user) {
-               resp = user ;         
+               for (var i in user) {
+                   DUBBE.ddo.usersArray.push(new DUBBE.ddo.user(user[i]));
+               }           
             },
             error:function (xhr, ajaxOptions, thrownError){
                 console.log(xhr.status);
                 console.log(thrownError);
             }  
         });
-
-        return resp ;
+    },
+     /**
+     * Gets the currently logged in user, so we now who he is!
+     */
+    getCurrent: function() {
+         $.ajax({
+            type: "GET",
+            url: "/api/user/current",
+            async: false,
+            success: function(user) {
+                DUBBE.ddo.currentUser = user ;
+            },
+            error:function (xhr, ajaxOptions, thrownError){
+                console.log(xhr.status);
+                console.log(thrownError);
+            }  
+        });
     }
 }
 
@@ -74,39 +63,6 @@ DUBBE.ddo.user = {
  */
 
 DUBBE.ddo.tasks = {
-    
-    /**
-     * Receivs all task for a project from the db, loops through them and render them with the help of DUBBE.ddo.task.render
-     * 
-     * @param {Object} param Object with the settings
-     * @param {Object} param.parentElement The element in which the task should be appended to
-     * @param {String} param.parent The id for the parent-project.
-     * 
-     */
-    renderAll: function(param) {
-
-        var that = this ;
-        
-        $.ajax({
-            type: "GET",
-            url: "/api/task/",
-            data: "parent="+param.parent,
-            success: function(tasks) {
-                for (var i in tasks) {
-                    that.render(tasks[i], param.parentElem) ;
-                }
-            },
-            error:function (xhr, ajaxOptions, thrownError){
-                console.log(xhr.status);
-                console.log(thrownError);
-            }  
-        });
-
-        
-    },
-    update: function() {
-        
-    },
     
     /**
      * When a task is droped on a ul (either one of the user, unassigned or done) this function updates the db with correct ownership
@@ -118,19 +74,12 @@ DUBBE.ddo.tasks = {
 
     assign: function(param) {
         
-        console.log(param.tasks) ;
-        
         $(param.tasks).each(function(i) {
             if(param.tasks[i].getId() == param.taskId) {
                 param.tasks[i].assign(param.userId) ;
             }
         })
-        
-
-
-    }
-    
-    
+    } 
 }
 
 /**
@@ -173,28 +122,45 @@ DUBBE.ddo.projects = {
          * We have to empty the two divs that contains tasks
          */
         
-        $("#users").empty() ;
-        $("#tasks").empty() ;
+        DUBBE.ddo.objects.tasksStart.empty() ;
+        DUBBE.ddo.objects.tasksEnd.empty() ;
+        DUBBE.ddo.objects.currentUser.empty() ;
+        DUBBE.ddo.objects.otherMembers.empty() ;
         
         /*
          * Renders the user-ul's where each user store there tasks
          */
-        for (i in project.getObject().teamMember) {
+        for (i in project.users) {
             
-            $("#users").append(
-                $("<h2>").text(DUBBE.ddo.user.get(project.getObject().teamMember[i]).name)
-            ).append(
-                $("<ul>").addClass("sortable").attr("id", project.getObject().teamMember[i])
-            )
+            if (project.users[i].getId() == DUBBE.ddo.currentUser._id) {
+                DUBBE.ddo.objects.currentUser.append(
+                    $("<h2>").text(project.users[i].getObject().name)
+                ).append(
+                    $("<ul>").addClass("sortable").attr("id", project.users[i].getId())) ;
+            }
+            else {
+                DUBBE.ddo.objects.otherMembers.append(
+                    $("<div>").append(
+                        $("<h2>").text(project.users[i].getObject().name)
+                    ).append(
+                        $("<ul>").addClass("sortable").attr("id", project.users[i].getId())
+                    )
+                )
+            }
         }
         
         /*
          * Renders containers for done and unassigned tasks
          */
         
-        unassigned = $("<ul>").attr("id", "unassigned").appendTo("#tasks").addClass("sortable") ;
-        done = $("<ul>").attr("id", "done").appendTo("#tasks").addClass("sortable") ;
+        $("<h2>").text("Otilldelade").appendTo(DUBBE.ddo.objects.tasksStart) ;
+        DUBBE.ddo.objects.tasksUnassigned = $("<ul>").attr("id", "unassigned").appendTo(DUBBE.ddo.objects.tasksStart).addClass("sortable") ;
         
+        $("<h2>").text("Färdiga").appendTo(DUBBE.ddo.objects.tasksEnd) ;
+        DUBBE.ddo.objects.tasksDone = $("<ul>").attr("id", "done").appendTo(DUBBE.ddo.objects.tasksEnd).addClass("sortable") ;
+        
+        $("<h2>").text("Ta bort").appendTo(DUBBE.ddo.objects.tasksEnd) ;
+        DUBBE.ddo.objects.tasksDelete = $("<ul>").attr("id", "delete").appendTo(DUBBE.ddo.objects.tasksEnd).addClass("sortable") ;
         
         // re-render the menuBar so we don't have a lot of unused buttons
         DUBBE.ddo.menuBar.render() ;
@@ -202,7 +168,7 @@ DUBBE.ddo.projects = {
         // Add create a task to the menuBar
         DUBBE.utils.createButton({
             text: "Skapa task",
-            parent: $("#menu"),
+            parent: DUBBE.ddo.objects.menu,
             fn: function() {
                 DUBBE.utils.popup({
                     header: "Ny task",
@@ -245,11 +211,10 @@ DUBBE.ddo.projects = {
         
         // Add user-management to menuBar
         
-        users = DUBBE.ddo.user.getAll() ;
         userList = {} ;
         
-        $(users).each(function(i) {
-            userList[users[i]._id] = users[i].name  ;
+        $(DUBBE.ddo.usersArray).each(function(i) {
+            userList[DUBBE.ddo.usersArray[i].getId()] = DUBBE.ddo.usersArray[i].getObject().name ;
         });
         
         DUBBE.utils.createButton({
@@ -293,6 +258,7 @@ DUBBE.ddo.projects = {
          */
         $(".sortable").sortable({
             connectWith: ".sortable",
+            placeholder: "placeHolder",
             receive: function(event, ui) {      
                 DUBBE.ddo.tasks.assign({
                     tasks: project.tasks,
@@ -338,11 +304,11 @@ DUBBE.ddo.menuBar = {
     render: function() {
         
         // Start by empty the div
-        $("#menu").empty() ;
+        DUBBE.ddo.objects.menu.empty() ;
         
         DUBBE.utils.createButton({
             text: "Skapa projekt",
-            parent: $("#menu"),
+            parent: DUBBE.ddo.objects.menu,
             fn: function(){
                 DUBBE.utils.popup({
                     header: "Nytt projekt",
@@ -389,7 +355,6 @@ DUBBE.ddo.ajax = {
         }
         else 
         if (msg.type == "task") {
-            console.log(parent) ;
             parent.addTask(msg) ;
        }
     } ,
@@ -464,9 +429,22 @@ DUBBE.ddo.ajax = {
 
 
 $(document).ready(function() {
+    /**
+     * All the objects we are working with
+     */
+    DUBBE.ddo.objects ={
+        taskContainer: $("#tasks"),
+        currentUser: $("#currentUser"),
+        otherMembers: $("#otherMembers"),
+        tasksStart: $("#tasksStart"),
+        tasksEnd: $("#tasksEnd"),
+        menu: $("#menu")
+    }
     
    
    DUBBE.ddo.projects.getAll() ;
+   DUBBE.ddo.users.getAll() ;
+   DUBBE.ddo.users.getCurrent() ;
    DUBBE.ddo.menuBar.render() ;
 
 });
