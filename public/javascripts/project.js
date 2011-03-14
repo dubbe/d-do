@@ -35,7 +35,9 @@ DUBBE.ddo.project.prototype.renderButton = function(){
         DUBBE.ddo.projects.render(that) ;
     }));
 }
+
 DUBBE.ddo.project.prototype.addTask = function(task){
+    
     var nmbr = this.tasks.push(new DUBBE.ddo.task(task)) ;
     
     this.tasks[nmbr-1].render() ;
@@ -55,11 +57,7 @@ DUBBE.ddo.project.prototype.initAllTasks = function() {
             for (var i in tasks) {
                 that.tasks.push(new DUBBE.ddo.task(tasks[i])) ;
             }
-        },
-        error:function (xhr, ajaxOptions, thrownError){
-            console.log(xhr.status);
-            console.log(thrownError);
-        }  
+        }
     });
 }
 

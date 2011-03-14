@@ -134,7 +134,7 @@ DUBBE.ddo.projects = {
             
             if (project.users[i].getId() == DUBBE.ddo.currentUser._id) {
                 DUBBE.ddo.objects.currentUser.append(
-                    $("<h2>").text(project.users[i].getObject().name)
+                    $("<h2>").text("Mina tasks")
                 ).append(
                     $("<ul>").addClass("sortable").attr("id", project.users[i].getId())) ;
             }
@@ -177,11 +177,11 @@ DUBBE.ddo.projects = {
                             name: "form",
                             fields: [{
                                 name: "title",
-                                type: "input",
+                                type: "text",
                                 label: "Namn"   
                             }, {
                                 name: "info",
-                                type: "text",
+                                type: "textarea",
                                 label: "Information"
                             }, {
                                 name: "prio",
@@ -316,19 +316,22 @@ DUBBE.ddo.menuBar = {
                         name: "form",
                         fields: [{
                             name: "title",
-                            type: "input",
+                            type: "text",
                             label: "Namn"
                         }, {
                             name: "info",
-                            type: "text",
+                            type: "textarea",
                             label: "Information"
                         }],
                         submit: function(p){
                         
-                            DUBBE.ddo.ajax.create({
+                            var project = DUBBE.ddo.ajax.create({
                                 data: p,
                                 model: "project"
                             });
+                            
+                            // project.renderButton() ;
+                            
                         },
                         submitText: "Spara"
                     })
@@ -347,25 +350,13 @@ DUBBE.ddo.menuBar = {
 
 DUBBE.ddo.ajax = {
     /**
-     * A middle-layer so i can add the parent to task.render and not to project.render 
-     */
-    render: function(msg, parent) {
-        if (msg.type == "project") {
-            DUBBE.ddo.projectsArray.push(new DUBBE.ddo.project(msg)) ;
-        }
-        else 
-        if (msg.type == "task") {
-            parent.addTask(msg) ;
-       }
-    } ,
-    /**
      * Function to take the output from the form and send it to the api
      */
     create: function(param) {
         
         var object = param.data ;
         var model = (param.model) ? param.model : "" ;
-        
+        var ret ;
         var data = "" ;
         
         $.each(object, function(i, val) {
@@ -384,15 +375,22 @@ DUBBE.ddo.ajax = {
             type: "POST",
             url: "/api/"+model,
             data: data,
+            async: false,
             success: function(msg) {
-                if (param.parentElem) {
-                    that.render(msg, param.parentElem) ;
+                if (msg.type == "project") {
+                    var arrId = DUBBE.ddo.projectsArray.push(new DUBBE.ddo.project(msg)) ;
+                    ret = DUBBE.ddo.projectsArray[arrId-1] ;
+                    
                 }
-                else {
-                    that.render(msg);
-                }
+                else 
+                if (msg.type == "task") {
+                    param.parentElem.addTask(msg) ;
+        
+               }
             }
         })
+        
+        return ret ;
     },
     update: function(param) {
         
@@ -441,10 +439,16 @@ $(document).ready(function() {
         menu: $("#menu")
     }
     
+    
+    
    
    DUBBE.ddo.projects.getAll() ;
    DUBBE.ddo.users.getAll() ;
    DUBBE.ddo.users.getCurrent() ;
    DUBBE.ddo.menuBar.render() ;
+   
+   console.log(DUBBE.ddo.currentUser) ;
+   
+   
 
 });

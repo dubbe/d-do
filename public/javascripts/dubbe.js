@@ -147,7 +147,7 @@ DUBBE.utils.createButton = function(param){
             e.preventDefault() ;
             param.fn();
         }).append( 
-            $("<div>").addClass("button").text(param.text)    
+            $("<div>").addClass("dubbeButton").text(param.text)    
         )
     );
     
@@ -234,32 +234,35 @@ DUBBE.namespace("DUBBE.form") ;
 
 DUBBE.form.create = function(param){
     
-    var form ;
+    var form, ul, li ;
     var inputs = {}  ;
     var name = (param.name) ? param.name : "form" ;
     var submitText = (param.submitText) ? param.submitText : "submit" ;
     
     form = $("<form>").attr("name", name) ;
+    ul =$("<ul>").appendTo(form) ;
     
     if(param.fields) {
         for (i = 0; i < param.fields.length; i += 1) {
             
-            var type = (param.fields[i].type) ? param.fields[i].type : "input" ;
+            li = $("<li>").appendTo(ul) ;
+            
+            var type = (param.fields[i].type) ? param.fields[i].type : "text" ;
             var value = (param.fields[i].value) ? param.fields[i].value : "" ;
             var label = (param.fields[i].label) ? param.fields[i].label+": " : param.fields[i].name+": " ;
             
             if(type != "hidden") {
                 $("<label>").attr({
                     for: param.fields[i].name
-                }).appendTo(form).text(label) ;
+                }).appendTo(li).text(label) ;
             }
             
             switch (type) {
-                case "text":
+                case "textarea":
                     input = $("<textarea>").attr({
                         name: param.fields[i].name,
                         value: value
-                    }).appendTo(form);
+                    }).appendTo(li);
                     break;
                     
                 case "hidden":
@@ -267,10 +270,10 @@ DUBBE.form.create = function(param){
                         type: type,
                         name: param.fields[i].name,
                         value: value
-                    }).appendTo(form);
+                    }).appendTo(li);
                     break;
                 case "select":
-                    input = $("<select>").appendTo(form);
+                    input = $("<select>").appendTo(li);
                     for (var index in param.fields[i].options) {
                         var option = $("<option>").attr({'text': param.fields[i].options[index], 'value': index}).appendTo(input) ;
                         
@@ -285,7 +288,7 @@ DUBBE.form.create = function(param){
                         type: type,
                         name: param.fields[i].name,
                         value: value
-                    }).appendTo(form);
+                    }).appendTo(li);
                     break;
             } 
             inputs[param.fields[i].name] = input ;
@@ -312,15 +315,21 @@ DUBBE.form.create = function(param){
                 }
             }                
             
-        }).appendTo(form) ;
+        }).appendTo($("<li>").appendTo(ul)) ;
 
     }
     
+    
+    
     if(param.parent) {
         $(form).appendTo(parent) ;
+        $("input").uniform();
     } else {
         return form ;
     }
+    
+    
+      
 
 }
 

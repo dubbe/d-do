@@ -1,7 +1,7 @@
 .popUp {
     position: absolute ;
-    padding: 10px ;
-    text-align: center ;
+    padding: 20px ;
+    text-align: left ;
     border: 1px solid #aaa ;
     
     /*color is up to you, overlay png gives button a gradient*/
@@ -24,11 +24,12 @@
      
      
 }
-.popUp p {
+.popUp p, .popUp form {
     display: block ;
     text-align: left ;
      font-size: 12px ;
-     margin: 10px;
+     margin: 10px 10px 10px 10px;
+     
      line-height: 1.5;
 }
 .popUpBg {
@@ -37,7 +38,7 @@
     position: absolute ;
     background: rgba(0,0,0,0.5) ;
 }
-.button {
+.dubbeButton {
      /*color is up to you, overlay png gives button a gradient*/
      background: #333 url(alert-overlay.png) repeat-x;
 
@@ -69,7 +70,7 @@
      text-decoration: none ;
      
 }
-.button:hover {
+.dubbeButton:hover {
      top: 1px ;
      -moz-box-shadow: 0 1px 1px rgba(0,0,0,0);
      -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0);
@@ -86,6 +87,11 @@
 .buttonConatinerRight {
     float:right ;
 }
+form ul li, form ul {
+    list-style-type: none ;
+    margin: 0px ;
+    padding: 0px ;
+}
 label {
     color: #000 ;
     font-size: 10px ;
@@ -94,11 +100,13 @@ label {
     display:block ;
     text-align: left ;
 }
+
 input, textarea, select {
-    /*color is up to you, overlay png gives button a gradient*/
+
+    width: 200px ;
+
      background: #fff url(alert-overlay.png) repeat-x;
 
-     /*set up the layout just right*/
      display: inline-block;
      padding: 7px 15px 8px;
      position: relative;
@@ -108,20 +116,24 @@ input, textarea, select {
     
     font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
 
-     /*style the cursor and text of the button*/
      color: #000;
      text-decoration: none;
      line-height: 1;
 
-     /*add rounded corners in mozilla and webkit*/
      -moz-border-radius: 5px;
      -webkit-border-radius: 5px;
 
-     /*Add box shadows and a bottom border with rgba colors*/
      text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+}
+textarea {
+    height: 120px ;
+}
+option {
+    padding: 50px 
 }
 input:focus, textarea:focus {
     outline: none ;
     -moz-box-shadow: 0 0 5px rgba(0, 255, 227, 0.5);
      -webkit-box-shadow: 0 0 5px rgba(0, 255, 227, 0.5);
 }
+*/

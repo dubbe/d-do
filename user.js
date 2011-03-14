@@ -91,7 +91,7 @@ User.prototype.create = function(user, callback) {
 User.prototype.get = function(id){
     
     return this.db.get(id, function (error, result) {
-        console.log(result) ;
+        result._id = id ;
         if(!error) {
             return result ;
         } 

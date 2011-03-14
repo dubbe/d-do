@@ -27,7 +27,7 @@ DUBBE.ddo.task.prototype.render = function(parent) {
     
     var that = this ;
     
-    parent = (this.getObject().userId) ? $("#"+this.getObject().userId) : $("#unassigned") ;
+    parent = (this.getObject().userId) ? $("#"+this.getObject().userId) : DUBBE.ddo.objects.tasksUnassigned ;
 
         
         var taskLi = $("<li>").attr("id", this.getId()).append(
@@ -40,12 +40,12 @@ DUBBE.ddo.task.prototype.render = function(parent) {
                             name: "form",
                             fields: [{
                                 name: "title",
-                                type: "input",
+                                type: "text",
                                 label: "Namn",
                                 value: that.getObject().title   
                             }, {
                                 name: "info",
-                                type: "text",
+                                type: "textarea",
                                 label: "Information",
                                 value: that.getObject().info 
                             }, {
