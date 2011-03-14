@@ -6,10 +6,14 @@
 DUBBE.namespace("DUBBE.ddo") ;
 
 /**
- * DUBBE.ddo.user will hold things to do with the user
+ * An array with all the projects (and the projects have an array in them with all the tasks)
  */
 
 DUBBE.ddo.projectsArray = [] ;
+
+/**
+ * DUBBE.ddo.user will hold things to do with the user
+ */
 
 DUBBE.ddo.user = {
     /**
@@ -134,6 +138,10 @@ DUBBE.ddo.tasks = {
  */
 
 DUBBE.ddo.projects = {
+    
+    /**
+     * Gets all projects from the db and add's them to an object.
+     */
     
     getAll: function() {
         $.ajax({

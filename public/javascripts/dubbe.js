@@ -125,24 +125,24 @@ DUBBE.utils.popup = function(param){
  */
 DUBBE.utils.createButton = function(param){
 
-    var class = "buttonContainerLeft" ;
+    var className = "buttonContainerLeft" ;
        
     if (param.align) {
         switch (param.align) {
             case "center":
-                class = "buttonContainer";
+                className = "buttonContainer";
                 break;
             case "right":
-                class = "buttonContainerRight";
+                className = "buttonContainerRight";
                 break;
             default:
-                class = "buttonContainerLeft";
+                className = "buttonContainerLeft";
                 break;
         }
     }
 
 
-    var btn = $("<div>").addClass(class).append(
+    var btn = $("<div>").addClass(className).append(
         $("<a>").attr("href", "#").addClass("buttonLink").click(function(e) {
             e.preventDefault() ;
             param.fn();
