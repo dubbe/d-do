@@ -57,6 +57,7 @@ DUBBE.utils.popup = function(param){
     }) ;
     
     if ($(".popUp").length > 0) {
+        $(bg).remove() ;
         return false ;
     }
     
@@ -105,8 +106,19 @@ DUBBE.utils.popup = function(param){
         }
     }
     
+    $(window).bind("keydown", function(e) {
+        if(e.which == 27) {
+            $(bg).remove() ;
+        }
+    })
+    
     // add the popup to the document
     $("body").append(bg) ;
+   
+    // Give first element focus, if form
+    if($("form").length != 0) {
+        $("form ul li input, textarea, select")[0].focus() ;
+    }
 
     // and last we have to center the div    
     DUBBE.utils.center(popup) ;
@@ -306,11 +318,9 @@ DUBBE.utils.dropDown = function(param) {
         }
     })
 
-
     $("<img>").attr("src", "images/icons/down.png").addClass("icon").insertAfter(header.find("p"))
     
     header.children("ul").width(header.outerWidth()-6);
-    
 
 }
 
@@ -368,6 +378,8 @@ DUBBE.form.create = function(param){
     ul =$("<ul>").appendTo(form) ;
     
     errorField = $("<li>").appendTo(ul) ;
+    
+    
     
     if(param.fields) {
         for (i = 0; i < param.fields.length; i += 1) {
@@ -450,65 +462,74 @@ DUBBE.form.create = function(param){
     
     
     if (param.submit) {
-    var submitFunction = function() {
-       var allClear = true;
-       
-       errorField.empty();
-       
-       for (i = 0; i < param.fields.length; i += 1) {
-           if (param.fields[i].validate) {
-               newParam = param.fields[i].validate;
-               newParam.obj = param.fields[i].inputObject;
-               if (!that.validate(newParam)) {
-                   param.fields[i].inputObject.addClass("error");
-                   errorField.append($("<img>").attr("src", "images/icons/dialog-error.png")).append($("<p>").html("<b>" + param.fields[i].label + ":</b><br />" + param.fields[i].validate.message).addClass("errorP")).append($("<div>").addClass("clr"));
-                   allClear = false;
-               }
-           }
-           
-           inputs[param.fields[i].name] = param.fields[i].inputObject;
-           
-       }
-       
-       if (allClear) {
-       
-           param.submit(inputs);
-           
-           $(form)[0].reset();
-           
-           if ($(form).parent().parent().attr("class") == "popUpBg") {
-               $(".popUpBg").remove();
-           }
-       }
-   }    
+        var submitFunction = function(){
+            var allClear = true;
+            
+            errorField.empty();
+            
+            for (i = 0; i < param.fields.length; i += 1) {
+                if (param.fields[i].validate) {
+                    newParam = param.fields[i].validate;
+                    newParam.obj = param.fields[i].inputObject;
+                    if (!that.validate(newParam)) {
+                        param.fields[i].inputObject.addClass("error");
+                        errorField.append($("<img>").attr("src", "images/icons/dialog-error.png")).append($("<p>").html("<b>" + param.fields[i].label + ":</b><br />" + param.fields[i].validate.message).addClass("errorP")).append($("<div>").addClass("clr"));
+                        allClear = false;
+                    }
+                }
+                
+                inputs[param.fields[i].name] = param.fields[i].inputObject;
+                
+            }
+            
+            if (allClear) {
+            
+                param.submit(inputs);
+                
+                $(form)[0].reset();
+                
+                if ($(form).parent().parent().attr("class") == "popUpBg") {
+                    $(".popUpBg").remove();
+                }
+            }
+        }
         DUBBE.utils.createButton({
             text: submitText,
             align: "center",
             fn: function(){
-               submitFunction() ; 
-            }                
-            
-        }).appendTo($("<li>").appendTo(ul)) ;
-        
-        $(form).keypress(function(e) {
-            
-            if(e.which === 13) {
-                e.preventDefault() ;
-                submitFunction() ;
+                submitFunction();
             }
             
-        })
-
+        }).appendTo($("<li>").appendTo(ul));
     }
     
+        
+
+        $(form).bind({
+            keypress: function(e) {
+                
+                if(e.which === 13) {
+                    e.preventDefault() ;
+                    submitFunction() ;
+                }
+                
+            }
+      
+        }) ; 
+        
+        
     
+                                                                               
     
     if(param.parent) {
         $(form).appendTo(parent) ;
-        $("input").uniform();
     } else {
         return form ;
     }
+    
+    
+    
+    
     
     
       

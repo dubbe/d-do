@@ -281,6 +281,39 @@ img.icon {
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
 }
+#tasksStart ul li.selectedTask, #tasksEnd ul li.selectedTask, #users div ul li.selectedTask {
+    -moz-box-shadow: 0px 0px 10px rgba(255, 0, 0, 1) ;
+    -webkit-box-shadow: 0px 0px 10px rgba(255, 0, 0, 1) ;;
+    box-shadow: 0px 0px 10px rgba(255, 0, 0, 1) ;
+}
+/**
+ * Footer
+ */
+#footer {
+    float: left ;
+    width: 1018px ;
+    margin-top: 10px ;
+    background: rgba(255, 255, 255, 0.5);
+    
+    border: 3px solid #fff;
+    
+    -moz-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    box-shadow: 0 0 7px rgba(0, 0, 0, .6);
+    
+}
+#footer div {
+    float: left ;
+    padding: 10px ;
+    width: 200px ;
+}
+#footer div h3 {
+    font-size: 12px ;
+}
+#footer div p {
+    font-size: 10px ;
+    margin: 0px ;
+}
 .clr  {
     clear: both ;
 }

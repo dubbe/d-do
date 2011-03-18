@@ -69,7 +69,7 @@ DUBBE.ddo.tasks = {
      *
      */
     assign: function(param){
-    
+        
         $(param.tasks).each(function(i){
             if (param.tasks[i].getId() == param.taskId) {
                 param.tasks[i].assign(param.userId);
@@ -193,7 +193,7 @@ DUBBE.ddo.projects = {
         }
         // Add create a task to the menuBar
         DUBBE.utils.createButton({
-            text: "Skapa task (2)",
+            text: "Skapa task",
             parent: DUBBE.ddo.objects.menu,
             fn: function(){
                 createTask() ;
@@ -239,7 +239,7 @@ DUBBE.ddo.projects = {
         
         
         DUBBE.utils.createButton({
-            text: "Lägg till användare (3)",
+            text: "Lägg till användare",
             parent: $("#menu"),
             fn: function(){
                 addUser() ;
@@ -274,9 +274,20 @@ DUBBE.ddo.projects = {
                     userId: $(this).attr("id")
                 })
                 
+                if ($(this).attr("id") == "tasksDelete") {
+                    $(ui.item).removeClass("tasks") ;
+                }
+  
+               
+                
             }
         }).disableSelection();
         
+        /*
+         * And finally we add keyboard-controll for the tasks
+         */
+        
+        DUBBE.ddo.keyboardControl(project.tasks);
         
     },
     
@@ -366,7 +377,7 @@ DUBBE.ddo.menuBar = {
         // Start by empty the div
         DUBBE.ddo.objects.menu.empty();
         DUBBE.utils.createButton({
-            text: "Skapa projekt (1)",
+            text: "Skapa projekt",
             parent: DUBBE.ddo.objects.menu,
             fn: function(){
                 DUBBE.ddo.projects.createForm();
@@ -464,6 +475,106 @@ DUBBE.ddo.ajax = {
     }
 }
 
+DUBBE.ddo.keyboardControl = function(allTasks) {
+    var task = null ;
+    var link = null ;
+    var container, li, i, index;
+    
+    i = -1 ;
+    
+    var keyEvents = function(e) {
+        li = $(this).parent().parent() ;
+        container = null ;
+        switch (e.which) {
+            case 13:    // Enter
+                e.preventDefault() 
+                break;
+            case 69:    // Edit
+                e.preventDefault() ;
+                $(this).click() ;
+                break ;
+            case 84:    // Take task
+                e.preventDefault() ;
+                container = DUBBE.ddo.objects.currentUser.children("ul") ;
+                li.appendTo(container) 
+                this.focus() ;
+                break;o
+            case 68:    // Done task
+                e.preventDefault() ;
+                container = DUBBE.ddo.objects.doneDiv.children("ul") ;
+                li.appendTo(container) ;
+                this.focus() ;
+                break;   
+           case 79:    // Otilldelade
+                e.preventDefault() ;
+                container = DUBBE.ddo.objects.tasksStart.children("ul") ;
+                li.appendTo(container) ;
+                this.focus() ;
+                break; 
+            case 88:    // Ta bort
+                e.preventDefault() ;
+                container = DUBBE.ddo.objects.deleteDiv.children("ul") ;
+                li.appendTo(container) ;
+                li.removeClass("task") ;
+                break;  
+            case 85:    // Lägg till annan användare
+                e.preventDefault() ;
+                
+                index = 0 ;
+
+                if(li.parent().parent().parent()[0] == DUBBE.ddo.objects.otherMembers[0]) {
+                    var divs = $(DUBBE.ddo.objects.otherMembers[0]).children("div");
+                    var div =$(li).parent().parent()[0]
+
+                    index = divs.index($(div)) +1 ;
+                    
+                    if(index >= divs.length) {
+                        console.log("ja?") ;
+                        index = 0 ;
+                    }
+                    
+                }
+                container = DUBBE.ddo.objects.otherMembers.children("div:eq("+index+")").children("ul") ;
+                li.appendTo(container) ;
+                this.focus() ;
+                break; 
+        }
+        
+        if (container != null) {
+            DUBBE.ddo.tasks.assign({
+                tasks: allTasks,
+                taskId: $(li).attr("id"),
+                userId: container.attr("id")
+            })
+        }
+        
+    }
+    
+    $(window).keydown(function(e) {
+        var tasks =  $(".task");
+        if (e.which == 78 && e.ctrlKey && e.altKey) {
+            if(link != null) {
+                link.unbind("keydown", keyEvents) ;
+            }
+            if (task == null) {
+                i = 0 ;
+                console.log("null") ;
+            } else {
+                i = tasks.index(task) + 1 ;
+            }
+
+
+            task = $(".task:eq("+i+")") ;
+            link = task.find("a") ;
+            
+            e.preventDefault() ;
+            $(".selectedTask").removeClass("selectedTask");
+            task.addClass("selectedTask")
+            link.focus().bind("keydown", keyEvents) ;
+        }
+    })
+    
+}
 
 $(document).ready(function(){
     /**
@@ -487,6 +598,7 @@ $(document).ready(function(){
     DUBBE.ddo.users.getAll();
     DUBBE.ddo.users.getCurrent();
     DUBBE.ddo.menuBar.render();
+    
     
     if (DUBBE.ddo.projectsArray.length > 0) {
         DUBBE.ddo.projects.render(DUBBE.ddo.projectsArray[0]);
