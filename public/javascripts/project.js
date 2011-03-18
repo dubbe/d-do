@@ -27,11 +27,10 @@ DUBBE.ddo.project.prototype.renderButton = function(){
     var that = this,
         parent = $("#projectBar") ;
     
-    $("<li>").append($("<a>").addClass("project").text(this.getObject().title).appendTo(parent));
-    
-    parent.append($("<li>").append($("<a>").text(this.getObject().title)).hover(function(){
+    parent.append($("<li>").append($("<a>").attr("href", "#").text(this.getObject().title)).hover(function(){
         $(this).css('cursor', 'pointer');
     }).click(function(){
+        //console.log(that) ;
         DUBBE.ddo.projects.render(that) ;
     }));
 }
@@ -43,6 +42,10 @@ DUBBE.ddo.project.prototype.addTask = function(task){
     this.tasks[nmbr-1].render() ;
     
     
+}
+
+DUBBE.ddo.project.prototype.addUser = function(user) {
+    this.users.push(new DUBBE.ddo.user(user)) ;
 }
 DUBBE.ddo.project.prototype.initAllTasks = function() {
     

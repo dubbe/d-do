@@ -30,60 +30,81 @@ DUBBE.ddo.task.prototype.render = function(parent) {
     parent = (this.getObject().userId) ? $("#"+this.getObject().userId) : DUBBE.ddo.objects.tasksUnassigned ;
 
         
-        var taskLi = $("<li>").attr("id", this.getId()).append(
-            $("<a>").text(this.getObject().title).attr("href", "#").click(function() {
-
-                DUBBE.utils.popup({
-                    header: "Editera task",
-                    obj: 
-                        DUBBE.form.create({
-                            name: "form",
-                            fields: [{
-                                name: "title",
-                                type: "text",
-                                label: "Namn",
-                                value: that.getObject().title   
-                            }, {
-                                name: "info",
-                                type: "textarea",
-                                label: "Information",
-                                value: that.getObject().info 
-                            }, {
-                                name: "prio",
-                                type: "select",
-                                label: "Prioritet",
-                                options: {
-                                    "1": "1",
-                                    "2": "2",
-                                    "3": "3",
-                                    "4": "4",
-                                    "5": "5"
-                                },
-                                selected: that.getObject().prio
-                            }],
-                            submit: function(p) {
-                                
-                                that.setObject(DUBBE.ddo.ajax.update({
-                                    data: p,
-                                    id: that.getId()
-                                })) ;
-                                
-                                that.render() ;
-                                
-                            },    
-                            submitText: "Spara"
-                        }) 
-                })
-
-            })
+        var taskLi = $("<li>").append(
+                $("<div>").addClass("prio").text(this.getObject().prio)
+            ).append(
+                $("<div>").addClass("icons").append(
+                    $("<img>").attr("src", "images/icons/edit.png").addClass("icon").click(function() {
+                        DUBBE.utils.popup({
+                            header: "Redigera task",
+                            obj: 
+                                DUBBE.form.create({
+                                    name: "form",
+                                    fields: [{
+                                        name: "title",
+                                        type: "text",
+                                        label: "Namn",
+                                        value: that.getObject().title,
+                                        validate: {
+                                            mandatory: true,
+                                            type: "text",
+                                            message: "Måste vara ifyllt."
+                                        }   
+                                    }, {
+                                        name: "info",
+                                        type: "textarea",
+                                        label: "Information",
+                                        value: that.getObject().info,
+                                        validate: {
+                                            mandatory: true,
+                                            type: "text",
+                                            message: "Måste vara ifyllt."
+                                        } 
+                                    }, {
+                                        name: "prio",
+                                        type: "select",
+                                        label: "Prioritet",
+                                        options: {
+                                            "1": "1",
+                                            "2": "2",
+                                            "3": "3",
+                                            "4": "4",
+                                            "5": "5"
+                                        },
+                                        selected: that.getObject().prio
+                                    }],
+                                    submit: function(p) {
+                                        
+                                        that.setObject(DUBBE.ddo.ajax.update({
+                                            data: p,
+                                            id: that.getId()
+                                        })) ;
+                                        
+                                        that.render() ;
+                                        
+                                    },    
+                                    submitText: "Spara"
+                                }) 
+                        })
+                    })
+                ).append(
+                    $("<img>").attr("src", "images/icons/comment.png").addClass("icon")
+                )
+            ).append(
+            $("<h3>").text(this.getObject().title).attr("href", "#")
         ).append(
-                $("<p>").text(this.getObject().info)
-            ) ;
+            $("<p>").text(this.getObject().info)
+        ).attr("id", this.getId()).hover(function() {
+                $(this).css('cursor','pointer');
+            }, function() {
+                $(this).css('cursor','auto');   
+            }
+        ) ;
         
         if ($("#"+this.getId()).length == 0) {
             taskLi.appendTo(parent) ;
         } else {
-            $("#"+this.getObject()._id).replaceWith(taskLi) ;
+            $("#"+this.getId()).replaceWith(taskLi) ;
         }
         
         

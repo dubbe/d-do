@@ -1,13 +1,22 @@
-ul#projectBar
-div.clr
-br
 - if (session.userid) 
-  #menu
+  #menuBar
+    #menu
+    #projects
+      ul#projectsMenu
+        li 
+          p Projekt
+          ul#projectBar
 div.clr
 #tasks
   #tasksStart
   #users
     #currentUser
+    div.clr
     #otherMembers
+    div.clr
   #tasksEnd
-div.clr
+    #done
+    div.clr
+    #delete
+    div.clr
+  div.clr

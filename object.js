@@ -108,6 +108,7 @@ ObjectModel.prototype.render = function(id, callback) {
     
 
     this.db.get(id, function(error, result) {
+        result._id = id ;
         if( error ){
             callback(error)
         }else{
@@ -126,10 +127,10 @@ ObjectModel.prototype.update = function(id, obj, callback){
             callback(error)
         }
         else {
-            that.db.get(result.id, function(error, result) {
+            that.db.get(result.id, function(error, res) {
                 if (!error) {
-                    result._id = result.id ;
-                    callback(null, result);
+                    res._id = result.id ;
+                    callback(null, res);
                 }
             });
         }

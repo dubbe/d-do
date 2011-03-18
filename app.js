@@ -114,7 +114,7 @@ app.get('/api/:model/:id?.:format?', function(req, res) {
                      res.end(task);
                  }
                  else {
-                     res.writeHead(404, {
+                     res.writeHead(200, {
                          'Content-type': 'application/text'
                      
                      })
@@ -143,7 +143,7 @@ app.get('/api/:model/:id?.:format?', function(req, res) {
              })
          }
     } else {
-        res.writeHead(400, {
+        res.writeHead(404, {
             'Content-type': 'application/text'
         
         })
@@ -175,7 +175,7 @@ app.post('/api/:model?', function(req, res) {
     
         if (error) {
             
-            res.writeHead(200, {
+            res.writeHead(404, {
                 'Content-type': 'application/json',
             })
             
@@ -185,8 +185,7 @@ app.post('/api/:model?', function(req, res) {
     
         if (task) {
             res.writeHead(200, {
-                'Content-type': 'application/json',
-                'Content-length': JSON.stringify(task).length
+                'Content-type': 'application/json'
             })
             
             res.end(JSON.stringify(task));
@@ -206,8 +205,7 @@ app.put('/api/:model/:id.:format?', function(req, res) {
         
             if (obj) {
                 res.writeHead(200, {
-                    'Content-type': 'application/json',
-                    'Content-length': JSON.stringify(obj).length
+                    'Content-type': 'application/json'
                 })
                 
                 res.end(JSON.stringify(obj));

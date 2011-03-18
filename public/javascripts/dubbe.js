@@ -56,6 +56,10 @@ DUBBE.utils.popup = function(param){
         }
     }) ;
     
+    if ($(".popUp").length > 0) {
+        return false ;
+    }
+    
     // we have to make sure that the bg fills the creen
     DUBBE.utils.fillScreen(bg) ;
     
@@ -208,6 +212,123 @@ DUBBE.utils.fillScreen = function fillScreen(obj) {
     return obj;
 } ;
 
+DUBBE.utils.dropDown = function(param) {
+    var header = param.obj.children("li") ;
+    var projectBarLi = $("ul#projectBar > li")
+    
+    param.obj.addClass("dropDown") ;
+    
+    var i = null ;
+    
+
+    // Lets bind some events to the menu
+    
+    header.children("ul").find("a").bind({
+        "focus": function(){
+            $(".focus").removeClass("focus") ;
+            $(this).parent().addClass("focus");
+        },
+        "blur": function(){
+            $(this).parent().removeClass("focus");
+        }
+    })
+    projectBarLi.hover(function() {
+        $(".focus").removeClass("focus") ;
+        $(this).addClass("focus") ;
+    },
+    function() {
+        $(this).removeClass("focus") ;
+    }) 
+    
+    
+    var handler = function(e) {
+        
+        if(e.which === 38) {
+            if (i > 0) {
+                i--;
+                header.children("ul").find("a")[i].focus();
+            }
+            
+        } else if (e.which === 40) {
+
+            if (i < header.children("ul").find("a").length-1) {
+                i++;
+                header.children("ul").find("a")[i].focus();
+            }
+        }
+    }
+
+    
+    header.addClass("dropDownHidden").click(function(e) {
+        i = -1;
+        
+        // Remove any a-focus
+        header.children("ul").find("a").blur() ;
+        
+        if($(this).attr("class") == "dropDownHidden") {
+            $(this).attr("class", "dropDownVisible") ;
+
+            $(window).bind('keydown', handler) ;
+            
+        } else {
+            if($(e.target).attr("class") !== "dropDownVisible" && e.target.nodeName === "LI") {
+                
+                $(".dropDownVisible p").text($(e.target).children("a").text()) ;
+            
+            } else if (e.target.nodeName === "A") {
+                
+                $(".dropDownVisible p").text($(e.target).text()) ;
+            
+            }
+            
+            $(this).attr("class", "dropDownHidden") ;
+            
+            $(window).unbind('keydown', handler);
+            
+            header.children("ul").width(header.outerWidth()-6);
+        }
+    }).mouseleave(function() {
+        if ($(this).attr("class") == "dropDownVisible") {
+            $(this).attr("class", "dropDownHidden");
+        }
+        
+        $(window).unbind('keydown', handler);
+    }); 
+    
+    
+    /*
+     * Adding a key-shortcut, not so generic, must think about this
+     */
+    this.keyShortCut({
+        keyCode: 52,
+        fn: function() {
+            header.click() ;
+        }
+    })
+
+
+    $("<img>").attr("src", "images/icons/down.png").addClass("icon").insertAfter(header.find("p"))
+    
+    header.children("ul").width(header.outerWidth()-6);
+    
+
+}
+
+DUBBE.utils.toolTip = function(param) {
+    
+}
+
+DUBBE.utils.keyShortCut = function(param) {
+    
+    $(window).keydown(function(e) {
+        if(e.ctrlKey && e.altKey && e.which == param.keyCode) {
+            e.preventDefault() ;
+            param.fn() ;
+        }
+    })
+
+}
+
 /**
  * @namespace
  * 
@@ -228,19 +349,25 @@ DUBBE.namespace("DUBBE.form") ;
  * @param {String} [param.fields.label] The label or the formfield, defaults to param.fields.name
  * @param {String} [param.fields.options]
  * @param {String} [param.fields.selected]
+ * @param {Object} [param.validate] Functions to validate the form
  * 
  * TODO: validation
  */
 
 DUBBE.form.create = function(param){
     
-    var form, ul, li ;
+    var form, ul, li, errorField ;
+    var newParam ;
+    var that = this ;
     var inputs = {}  ;
+    var validation = {} ;
     var name = (param.name) ? param.name : "form" ;
     var submitText = (param.submitText) ? param.submitText : "submit" ;
     
     form = $("<form>").attr("name", name) ;
     ul =$("<ul>").appendTo(form) ;
+    
+    errorField = $("<li>").appendTo(ul) ;
     
     if(param.fields) {
         for (i = 0; i < param.fields.length; i += 1) {
@@ -263,6 +390,7 @@ DUBBE.form.create = function(param){
                         name: param.fields[i].name,
                         value: value
                     }).appendTo(li);
+                    
                     break;
                     
                 case "hidden":
@@ -291,31 +419,85 @@ DUBBE.form.create = function(param){
                     }).appendTo(li);
                     break;
             } 
-            inputs[param.fields[i].name] = input ;
+            param.fields[i].inputObject = input ;
             
+         
+            // Validation
+            
+            if(param.fields[i].validate) {
+
+                newParam = param.fields[i].validate ;
+                
+                input.blur(function() {
+                   newParam.obj = this ;
+                   if(!that.validate(newParam)) {
+                       $(this).addClass("error") ;
+                   } else {
+                       $(this).removeClass("error") ;
+                   }
+                
+                })
+            }    
         }
     }
+   
+   
+   
     
     // Need to add a clear so the button is correctly aligned
     $("<div>").addClass("clr").appendTo(form) ;
     
+    
+    
     if (param.submit) {
-        
+    var submitFunction = function() {
+       var allClear = true;
+       
+       errorField.empty();
+       
+       for (i = 0; i < param.fields.length; i += 1) {
+           if (param.fields[i].validate) {
+               newParam = param.fields[i].validate;
+               newParam.obj = param.fields[i].inputObject;
+               if (!that.validate(newParam)) {
+                   param.fields[i].inputObject.addClass("error");
+                   errorField.append($("<img>").attr("src", "images/icons/dialog-error.png")).append($("<p>").html("<b>" + param.fields[i].label + ":</b><br />" + param.fields[i].validate.message).addClass("errorP")).append($("<div>").addClass("clr"));
+                   allClear = false;
+               }
+           }
+           
+           inputs[param.fields[i].name] = param.fields[i].inputObject;
+           
+       }
+       
+       if (allClear) {
+       
+           param.submit(inputs);
+           
+           $(form)[0].reset();
+           
+           if ($(form).parent().parent().attr("class") == "popUpBg") {
+               $(".popUpBg").remove();
+           }
+       }
+   }    
         DUBBE.utils.createButton({
             text: submitText,
             align: "center",
             fn: function(){
-                
-                param.submit(inputs) ;
-                
-                $(form)[0].reset() ;
-                
-                if($(form).parent().parent().attr("class") == "popUpBg") {
-                    $(".popUpBg").remove() ;
-                }
+               submitFunction() ; 
             }                
             
         }).appendTo($("<li>").appendTo(ul)) ;
+        
+        $(form).keypress(function(e) {
+            
+            if(e.which === 13) {
+                e.preventDefault() ;
+                submitFunction() ;
+            }
+            
+        })
 
     }
     
@@ -330,6 +512,35 @@ DUBBE.form.create = function(param){
     
     
       
+
+}
+
+DUBBE.form.validate = function(param) {
+    var regex ;
+    var string = $(param.obj).val() ;
+
+    // Start with at mandatory check!
+    if(param.mandatory === true && string === "") {
+        return false ;
+    }
+    
+    // Check if we have a regex
+    if(param.regex && !string.match(param.regex)) {
+        return false ;
+    } else if (param.type){
+        
+        switch (param.type) {
+            case "text":
+                regex = /^[\w\n åäö\.\!\?\,]+$/i
+                break
+        }
+        if(!string.match(regex)) {
+            console.log(regex) ;
+            return false ;
+        }
+    }
+    
+    return true ;
 
 }
 
