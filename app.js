@@ -1,5 +1,5 @@
-var fbId= "167696906616095";
-var fbSecret= "cc7a919fca15b42267ae674b2fc89bc9";
+var fbId= "XXXX";
+var fbSecret= "XXXX";
 var fbCallbackAddress= "http://vpn.dubbe.se/auth/facebook"; 
 /**
  * Module dependencies.
